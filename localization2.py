@@ -13,7 +13,7 @@ class Localization(FeatureExtraction):
         
         # Initial state
         self.mean = np.zeros((3,1))
-        self.cov = np.diag([0**2, 0**2, np.deg2rad(0)**2])
+        self.cov = np.diag([1**2, 1**2, np.deg2rad(1)**2])
         
         # Noise matrix
         self.Q = Q

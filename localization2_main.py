@@ -5,22 +5,6 @@ import math
 import numpy as np
 import time
 
-# def bluetooth_handler():
-#     bluetooth = serial.Serial("COM4", 115200)
-#     while True:
-#         data = bluetooth.read().decode()
-#         if data == "f":
-#             mcu.write(10, 0)
-#         elif data == "l":
-#             mcu.write(-5, 5)
-#         elif data == "r":
-#             mcu.write(5, -5)
-#         else:
-#             mcu.write(0, 0)
-
-# bluetooth_thread = threading.Thread(target=bluetooth_handler, daemon=True)
-# bluetooth_thread.start()
-
 lidar = MyLidar("COM10")
 lidar.start()
 
@@ -51,11 +35,9 @@ try:
                 delta_y = d * math.sin(robot.mean[2, 0] + alpha/2)
                 robot.predict(delta_x, delta_y, alpha)
             robot.correct()
-            # robot.add_waypoint()
             robot.path_tracking()
             mcu.write(robot.linear_vel, robot.turn_vel)
         time.sleep(0.001)
 except KeyboardInterrupt:
     lidar.stop()
     mcu.stop()
-    # robot.save_waypoints()

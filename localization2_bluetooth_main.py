@@ -1,4 +1,4 @@
-from ekfslam2 import EkfSlam
+from localization2 import Localization
 from my_lidar import MyLidar
 from my_mcu import MyMCU
 import math
@@ -33,9 +33,13 @@ mcu.start()
 Q = np.diag([0.1**2, 0.1**2, np.deg2rad(1)**2])
 R = np.diag([50**2, np.deg2rad(1)**2])
 
-robot = EkfSlam(min_range=150, max_range=4000, point_dist_threshold=10, min_cluster_size=10, max_cluster_size=40,
-                avg_angles_lower_bound=np.deg2rad(120), avg_angles_upper_bound=np.deg2rad(160), std_angles_threshold=np.deg2rad(8),
-                min_radius=30, max_radius=40, max_landmarks=2, Q=Q, R=R, maha_threshold=9, waypoint_min_distance=300)
+robot = Localization(min_range=0, max_range=4000, point_dist_threshold=10, min_cluster_size=10, max_cluster_size=40,
+                     avg_angles_lower_bound=np.deg2rad(90), avg_angles_upper_bound=np.deg2rad(135),
+                     std_angles_threshold=np.deg2rad(8.6), min_radius=30, max_radius=40, Q=Q, R=R, maha_threshold=9,
+                     linear_vel_max=10, turn_vel_max=5, waypoint_range=50, kp_dist=1, kp_heading=1,
+                     waypoint_min_distance=300)
+
+robot.load_landmarks()
 
 try:
     while True:
@@ -53,4 +57,4 @@ try:
 except KeyboardInterrupt:
     lidar.stop()
     mcu.stop()
-    robot.save_data()
+    robot.save_waypoints()
