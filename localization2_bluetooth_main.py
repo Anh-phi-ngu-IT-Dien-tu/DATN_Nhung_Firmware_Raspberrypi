@@ -1,7 +1,6 @@
 from localization2 import Localization
 from my_lidar import MyLidar
 from my_mcu import MyMCU
-import math
 import numpy as np
 import threading
 import serial
@@ -29,9 +28,9 @@ lidar.start()
 mcu = MyMCU("COM3", 115200)
 mcu.start()
 
-# Noise matrix
-Q = np.diag([0.1**2, 0.1**2, np.deg2rad(1)**2])
-R = np.diag([50**2, np.deg2rad(1)**2])
+# Noise parameters
+Q = [0.1, 0.1]
+R = [0.1, np.deg2rad(1)]
 
 robot = Localization(min_range=0, max_range=4000, point_dist_threshold=10, min_cluster_size=10, max_cluster_size=40,
                      avg_angles_lower_bound=np.deg2rad(90), avg_angles_upper_bound=np.deg2rad(135),
@@ -46,11 +45,8 @@ try:
         scan = lidar.read()
         if len(scan) > 0:
             robot.extract_landmarks(scan)
-            d, alpha = mcu.read()
-            if d != 0 or alpha != 0:
-                delta_x = d * math.cos(robot.mean[2, 0] + alpha/2)
-                delta_y = d * math.sin(robot.mean[2, 0] + alpha/2)
-                robot.predict(delta_x, delta_y, alpha)
+            dr, dl, b = mcu.read()
+            robot.predict(dr, dl, b)
             robot.correct()
             robot.add_waypoint()
         time.sleep(0.001)

@@ -52,23 +52,39 @@ class EkfSlam(FeatureExtraction):
         return (R @ pr + T)
     
     # Call this method to update robot's pose base on odometry        
-    def predict(self, delta_x, delta_y, delta_theta):
-        # predict robot's pose mean
-        self.mean[0, 0] += delta_x
-        self.mean[1, 0] += delta_y
-        self.mean[2, 0] = self.wrap_angle(self.mean[2, 0] + delta_theta)
+    def predict(self, dr, dl, b):
+        d = (dr + dl)/2
+        alpha = (dr - dl)/b
+        delta_x = d * math.cos(self.mean[2, 0] + alpha/2)
+        delta_y = d * math.sin(self.mean[2, 0] + alpha/2)
 
         # Jacobian of the motion
-        Gx = np.array(([[0, 0, -delta_y],
-                        [0, 0, delta_x],
-                        [0, 0, 0]]))
-
+        Gx = np.array([[0, 0, -delta_y],
+                       [0, 0, delta_x],
+                       [0, 0, 0]])
+        
         # map Gx matrix (3x3) to (2N+3)x(2N+3) dimensional space
         Fx = np.eye(3, 2 * self.max_lm + 3)
         G = np.eye(2 * self.max_lm + 3) + Fx.T @ Gx @ Fx
 
+        # Command noise matrix
+        Mx = np.diag([(self.Q[0] * dr)**2, (self.Q[1] * dl)**2])
+
+        # Jacobian of command noise
+        Vx = np.array([[math.cos(self.mean[2, 0] + alpha/2)/2 - d/(2*b)*math.sin(self.mean[2, 0] + alpha/2), math.cos(self.mean[2, 0] + alpha/2)/2 + d/(2*b)*math.sin(self.mean[2, 0] + alpha/2)],
+                      [math.sin(self.mean[2, 0] + alpha/2)/2 + d/(2*b)*math.cos(self.mean[2, 0] + alpha/2), math.sin(self.mean[2, 0] + alpha/2)/2 - d/(2*b)*math.cos(self.mean[2, 0] + alpha/2)],
+                      [1/b, -1/b]])
+        
+        # Noise matrix map from 2x2 to 3x3 dimensional space
+        Qx = Vx @ Mx @ Vx.T
+
+        # predict robot's pose mean
+        self.mean[0, 0] += delta_x
+        self.mean[1, 0] += delta_y
+        self.mean[2, 0] = self.wrap_angle(self.mean[2, 0] + alpha)
+
         # predict robot's pose covariance
-        self.cov = G @ self.cov @ G.T + Fx.T @ self.Q @ Fx
+        self.cov = G @ self.cov @ G.T + Fx.T @ Qx @ Fx
 
     # Call this method to correct robot's pose from lidar's measurements
     def correct(self):
@@ -115,8 +131,11 @@ class EkfSlam(FeatureExtraction):
                 H = Hx @ Fx
                 H_list.append(H)
 
+                # Sensor noise matrix
+                R = np.diag([(self.R[0] * z[0, 0])**2, self.R[1]**2])
+
                 # Inverse of the innovation covariance
-                inv_psi = np.linalg.inv(H @ self.cov @ H.T + self.R)
+                inv_psi = np.linalg.inv(H @ self.cov @ H.T + R)
                 inv_psi_list.append(inv_psi)
 
             if self.known_lm > 0:

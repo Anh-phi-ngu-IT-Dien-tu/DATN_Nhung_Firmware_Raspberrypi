@@ -56,19 +56,32 @@ class Localization(FeatureExtraction):
         return (R @ pr + T)
     
     # Call this method to update robot's pose base on odometry        
-    def predict(self, delta_x, delta_y, delta_theta):
+    def predict(self, dr, dl, b):
+        d = (dr + dl)/2
+        alpha = (dr - dl)/b
+        delta_x = d * math.cos(self.mean[2, 0] + alpha/2)
+        delta_y = d * math.sin(self.mean[2, 0] + alpha/2)
+
+        # Jacobian of the motion
+        G = np.array([[1, 0, -delta_y],
+                      [0, 1, delta_x],
+                      [0, 0, 1]])
+        
+        # Command noise matrix (dr, dl)
+        M = np.diag([(self.Q[0] * dr)**2, (self.Q[1] * dl)**2])
+
+        # Jacobian of command noise
+        V = np.array([[math.cos(self.mean[2, 0] + alpha/2)/2 - d/(2*b)*math.sin(self.mean[2, 0] + alpha/2), math.cos(self.mean[2, 0] + alpha/2)/2 + d/(2*b)*math.sin(self.mean[2, 0] + alpha/2)],
+                      [math.sin(self.mean[2, 0] + alpha/2)/2 + d/(2*b)*math.cos(self.mean[2, 0] + alpha/2), math.sin(self.mean[2, 0] + alpha/2)/2 - d/(2*b)*math.cos(self.mean[2, 0] + alpha/2)],
+                      [1/b, -1/b]])
+
         # predict robot's pose mean
         self.mean[0, 0] += delta_x
         self.mean[1, 0] += delta_y
-        self.mean[2, 0] = self.wrap_angle(self.mean[2, 0] + delta_theta)
-
-        # Jacobian of the motion
-        G = np.array(([[1, 0, -delta_y],
-                       [0, 1, delta_x],
-                       [0, 0, 1]]))
+        self.mean[2, 0] = self.wrap_angle(self.mean[2, 0] + alpha)
 
         # predict robot's pose covariance
-        self.cov = G @ self.cov @ G.T + self.Q
+        self.cov = G @ self.cov @ G.T + V @ M @ V.T
 
     # Call this method to correct robot's pose from lidar's measurements
     def correct(self):
@@ -95,8 +108,11 @@ class Localization(FeatureExtraction):
             H = 1/q * np.array([[-np.sqrt(q) * lm_delta_x, -np.sqrt(q) * lm_delta_y, 0],
                                  [lm_delta_y, -lm_delta_x, -q]])
 
+            # Sensor noise matrix
+            R = np.diag([(self.R[0] * z[0, 0])**2, self.R[1]**2])
+
             # Inverse of the innovation covariance
-            inv_psi = np.linalg.inv(H @ self.cov @ H.T + self.R)
+            inv_psi = np.linalg.inv(H @ self.cov @ H.T + R)
 
             # Mahalanobis distance
             pi = ((z_t - z).T @ inv_psi @ (z_t - z))[0, 0]
@@ -116,15 +132,15 @@ class Localization(FeatureExtraction):
                     self.linear_vel = 0
                     self.turn_vel = 0
                 else:
-                    self.pid_controller()
+                    self.p_controller()
             else:
-                self.pid_controller()
+                self.p_controller()
                 
         else:
             self.linear_vel = 0
             self.turn_vel = 0
 
-    def pid_controller(self):
+    def p_controller(self):
         e_dist = math.sqrt((self.saved_waypoints[self.last_waypoint_index][0] - self.mean[0, 0])**2 + (self.saved_waypoints[self.last_waypoint_index][1] - self.mean[1, 0])**2)
         e_heading = self.wrap_angle(math.atan2(self.saved_waypoints[self.last_waypoint_index][1] - self.mean[1, 0], self.saved_waypoints[self.last_waypoint_index][0] - self.mean[0, 0]) - self.mean[2, 0])
         self.linear_vel = self.kp_dist * e_dist
