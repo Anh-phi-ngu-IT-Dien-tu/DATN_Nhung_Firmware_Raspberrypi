@@ -7,34 +7,36 @@ import serial
 import time
 
 def bluetooth_handler():
-    bluetooth = serial.Serial("COM4", 115200)
+    bluetooth = serial.Serial("/dev/rfcomm0", 115200)
     while True:
         data = bluetooth.read().decode()
         if data == "f":
-            mcu.write(10, 0)
+            mcu.write(50, 0)
         elif data == "l":
-            mcu.write(-5, 5)
+            mcu.write(0, np.pi/18)
         elif data == "r":
-            mcu.write(5, -5)
+            mcu.write(0, -np.pi/18)
+        elif data== "b":
+            mcu.write(-50, 0)
         else:
             mcu.write(0, 0)
 
 bluetooth_thread = threading.Thread(target=bluetooth_handler, daemon=True)
 bluetooth_thread.start()
 
-lidar = MyLidar("COM10")
+lidar = MyLidar("/dev/ttyUSB1")
 lidar.start()
 
-mcu = MyMCU("COM3", 115200)
+mcu = MyMCU("/dev/ttyUSB0", 115200)
 mcu.start()
 
 # Noise parameters
-Q = [0.1, 0.1]
+Q = [0.12, 0.12]
 R = [0.1, np.deg2rad(1)]
 
-robot = EkfSlam(min_range=150, max_range=4000, point_dist_threshold=10, min_cluster_size=10, max_cluster_size=40,
+robot = EkfSlam(min_range=150, max_range=2000, point_dist_threshold=10, min_cluster_size=5, max_cluster_size=40,
                 avg_angles_lower_bound=np.deg2rad(120), avg_angles_upper_bound=np.deg2rad(160), std_angles_threshold=np.deg2rad(8),
-                min_radius=30, max_radius=40, max_landmarks=2, Q=Q, R=R, maha_threshold=9, waypoint_min_distance=300)
+                min_radius=30, max_radius=40, max_landmarks=10, Q=Q, R=R, maha_threshold=9.5, waypoint_min_distance=300)
 
 try:
     while True:
@@ -45,8 +47,15 @@ try:
             robot.predict(dr, dl, b)
             robot.correct()
             robot.add_waypoint()
-        time.sleep(0.001)
+        
+        # dr, dl, b = mcu.read()
+        # if b != 0:
+        #     robot.predict(dr, dl, b)
+        # print(dr, dl, b)
+        time.sleep(0.01)
 except KeyboardInterrupt:
     lidar.stop()
     mcu.stop()
     robot.save_data()
+    print(robot.mean)
+    print(robot.known_lm)

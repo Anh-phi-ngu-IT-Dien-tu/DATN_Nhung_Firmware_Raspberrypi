@@ -24,8 +24,8 @@ class MyMCU:
                 self.ser.close()
                 break
             try:
-                buffer = self.ser.read(8)
-                dr, dl, b = struct.unpack('fff', buffer)
+                buffer = self.ser.read(12)
+                dl, dr, b = struct.unpack('fff', buffer)
                 with self.lock:
                     self.dr += dr
                     self.dl += dl
