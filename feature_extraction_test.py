@@ -18,14 +18,14 @@ def animate(i):
     
     if len(scan) > 0:
         robot.extract_landmarks(scan)
-        ax.clear()
+        # ax.clear()
         x = [val[0] for val in robot.landmarks]
         y = [val[1] for val in robot.landmarks]
         ax.scatter(x, y)
-        ax.set_ylim([-2000, 2000])
-        ax.set_xlim([-2000, 2000])
+        ax.set_ylim([-1000, 1000])
+        ax.set_xlim([-1000, 1000])
 
-ani = animation.FuncAnimation(fig, animate, frames=100, interval=50)
+ani = animation.FuncAnimation(fig, animate, frames=100, interval=200)
 
 plt.show()
 lidar.stop()

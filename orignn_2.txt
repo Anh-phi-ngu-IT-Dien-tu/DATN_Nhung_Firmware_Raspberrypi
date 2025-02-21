@@ -1,0 +1,12 @@
+Delta compression using up to 4 threads
+Compressing objects: 100% (25/25), done.
+Writing objects: 100% (51/51), 30.74 KiB | 10.25 MiB/s, done.
+Total 51 (delta 24), reused 44 (delta 21), pack-reused 0
+remote: Resolving deltas: 100% (24/24), done.
+remote: 
+remote: Create a pull request for 'Raspberrypi' on GitHub by visiting:
+remote:      https://github.com/Anh-phi-ngu-IT-Dien-tu/DATN_Nhung_Firmware_Raspberrypi/pull/new/Raspberrypi
+remote: 
+To https://github.com/Anh-phi-ngu-IT-Dien-tu/DATN_Nhung_Firmware_Raspberrypi.git
+ * [new branch]      Raspberrypi -> Raspberrypi
+branch 'Raspberrypi' set up to track 'orignn_2/Raspberrypi'.
