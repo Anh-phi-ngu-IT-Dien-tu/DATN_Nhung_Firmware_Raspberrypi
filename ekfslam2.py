@@ -19,9 +19,9 @@ class EkfSlam(FeatureExtraction):
         # Initial state
         self.mean = np.zeros((2*max_landmarks + 3, 1))
         self.cov = np.zeros((2*max_landmarks + 3, 2*max_landmarks + 3))
-        self.cov[0, 0] = 1**2
-        self.cov[1, 1] = 1**2
-        self.cov[2, 2] = np.deg2rad(1)**2
+        self.cov[0, 0] = 10**2
+        self.cov[1, 1] = 10**2
+        self.cov[2, 2] = np.deg2rad(5)**2
         for i in range(3, 2*max_landmarks + 3):
             self.cov[i, i] = 1e6
 

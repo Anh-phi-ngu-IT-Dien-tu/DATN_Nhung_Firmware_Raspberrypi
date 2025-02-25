@@ -35,9 +35,9 @@ mcu.start()
 Q = [0.25, 0.25]
 R = [0.15, np.deg2rad(2)]
 
-robot = EkfSlam(min_range=150, max_range=2000, point_dist_threshold=10, min_cluster_size=5, max_cluster_size=40,
+robot = EkfSlam(min_range=150, max_range=2000, point_dist_threshold=10, min_cluster_size=5, max_cluster_size=30,
                 avg_angles_lower_bound=np.deg2rad(120), avg_angles_upper_bound=np.deg2rad(160), std_angles_threshold=np.deg2rad(8),
-                min_radius=30, max_radius=40, max_landmarks=10, Q=Q, R=R, maha_threshold=10.6, waypoint_min_distance=300)
+                min_radius=30, max_radius=40, max_landmarks=20, Q=Q, R=R, maha_threshold=10.6, waypoint_min_distance=50)
 
 n = 0
 test1 = []
@@ -55,7 +55,7 @@ try:
             n += 1
             robot.extract_landmarks(scan)
             robot.correct()
-            robot.add_waypoint()
+        robot.add_waypoint()
         
 except KeyboardInterrupt:
     lidar.stop()

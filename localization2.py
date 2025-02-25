@@ -13,7 +13,7 @@ class Localization(FeatureExtraction):
         
         # Initial state
         self.mean = np.zeros((3,1))
-        self.cov = np.diag([1**2, 1**2, np.deg2rad(1)**2])
+        self.cov = np.diag([50**2, 50**2, np.deg2rad(5)**2])
         
         # Noise matrix
         self.Q = Q
@@ -39,6 +39,8 @@ class Localization(FeatureExtraction):
         # Create path
         self.waypoint_th = waypoint_min_distance
         self.waypoints = []
+
+        self.test = []
 
     # Return angle between -pi and pi
     def wrap_angle(self, angle):
@@ -117,6 +119,7 @@ class Localization(FeatureExtraction):
             # Mahalanobis distance
             pi = ((z_t - z).T @ inv_psi @ (z_t - z))[0, 0]
 
+            self.test.append(pi)
             # Validation gate
             if pi < self.maha_th:
                 K = self.cov @ H.T @ inv_psi
