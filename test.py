@@ -12,6 +12,6 @@ y = [val[0][1] for val in test]
 
 plt.scatter(x, y)
 ax=plt.gca()
-ax.set_xlim(-1000,1000)
-ax.set_ylim(-1000,1000)
+ax.set_xlim(-2000,2000)
+ax.set_ylim(-2000,2000)
 plt.show()

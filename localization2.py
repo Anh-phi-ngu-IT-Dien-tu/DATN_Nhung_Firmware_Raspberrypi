@@ -13,7 +13,7 @@ class Localization(FeatureExtraction):
         
         # Initial state
         self.mean = np.zeros((3,1))
-        self.cov = np.diag([50**2, 50**2, np.deg2rad(5)**2])
+        self.cov = np.diag([25**2, 25**2, np.deg2rad(4)**2])
         
         # Noise matrix
         self.Q = Q
@@ -87,6 +87,7 @@ class Localization(FeatureExtraction):
 
     # Call this method to correct robot's pose from lidar's measurements
     def correct(self):
+        self.test = []
         for landmark in self.landmarks:
             lmw = self.transform_global(landmark)
 

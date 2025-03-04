@@ -14,9 +14,9 @@ iterator = lidar.iter_scans(scan_type="express")
 Q = np.diag([0.1*0.1, 0.1*0.1, math.pi/180*math.pi/180])
 R = np.diag([120*120, math.pi/180*math.pi/180])
 
-robot = EkfSlam(min_range=150, max_range=2000, point_dist_threshold=10, min_cluster_size=10, max_cluster_size=40,
-                avg_angles_lower_bound=120*math.pi/180, avg_angles_upper_bound=160*math.pi/180, std_angles_threshold=8*math.pi/180,
-                min_radius=30, max_radius=40, max_landmarks=2, Q=Q, R=R, waypoint_min_distance=300, maha_threshold=9)
+robot = EkfSlam(min_range=150, max_range=2000, point_dist_threshold=12, min_cluster_size=6, max_cluster_size=25,
+                avg_angles_lower_bound=120*math.pi/180, avg_angles_upper_bound=160*math.pi/180, std_angles_threshold=6.5*math.pi/180,
+                min_radius=42, max_radius=47, max_landmarks=2, Q=Q, R=R, waypoint_min_distance=50, maha_threshold=9)
 
 def animate(i):
     scan = next(iterator)

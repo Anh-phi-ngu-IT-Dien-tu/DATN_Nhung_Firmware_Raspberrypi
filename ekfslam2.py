@@ -19,9 +19,9 @@ class EkfSlam(FeatureExtraction):
         # Initial state
         self.mean = np.zeros((2*max_landmarks + 3, 1))
         self.cov = np.zeros((2*max_landmarks + 3, 2*max_landmarks + 3))
-        self.cov[0, 0] = 10**2
-        self.cov[1, 1] = 10**2
-        self.cov[2, 2] = np.deg2rad(5)**2
+        self.cov[0, 0] = 0**2
+        self.cov[1, 1] = 0**2
+        self.cov[2, 2] = np.deg2rad(0)**2
         for i in range(3, 2*max_landmarks + 3):
             self.cov[i, i] = 1e6
 
@@ -35,6 +35,8 @@ class EkfSlam(FeatureExtraction):
         # Create path
         self.waypoint_th = waypoint_min_distance
         self.waypoints = []
+
+        self.test = []
 
     # Return angle between -pi and pi
     def wrap_angle(self, angle):
@@ -88,6 +90,7 @@ class EkfSlam(FeatureExtraction):
 
     # Call this method to correct robot's pose from lidar's measurements
     def correct(self):
+        self.test = []
         for landmark in self.landmarks:
             # This list stores the index of the closest landmark in database and the observed landmark
             lm_id = []
@@ -140,6 +143,7 @@ class EkfSlam(FeatureExtraction):
 
             if self.known_lm > 0:
                 pi = ((z_list[1] - z_list[0]).T @ inv_psi_list[0] @ (z_list[1] - z_list[0]))[0, 0]
+                self.test.append(pi)
                 if pi < self.maha_th:
                     j = 0
                 else:
