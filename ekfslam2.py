@@ -21,7 +21,7 @@ class EkfSlam(FeatureExtraction):
         self.cov = np.zeros((2*max_landmarks + 3, 2*max_landmarks + 3))
         self.cov[0, 0] = 0**2
         self.cov[1, 1] = 0**2
-        self.cov[2, 2] = np.deg2rad(0)**2
+        self.cov[2, 2] = np.deg2rad(5)**2
         for i in range(3, 2*max_landmarks + 3):
             self.cov[i, i] = 1e6
 
@@ -46,7 +46,7 @@ class EkfSlam(FeatureExtraction):
     def transform_global(self, point):
         pr = np.array([[point[0]],
                        [point[1]]])
-        alpha = self.mean[2, 0]
+        alpha = self.mean[2, 0] + 0.10337803649523618
         T = np.array([[self.mean[0, 0]],
                       [self.mean[1, 0]]])
         R = np.array([[math.cos(alpha), -math.sin(alpha)],
@@ -137,13 +137,15 @@ class EkfSlam(FeatureExtraction):
                 # Sensor noise matrix
                 R = np.diag([(self.R[0] * z[0, 0])**2, self.R[1]**2])
 
+                if i != self.known_lm:
+                    self.test.append(H @ self.cov @ H.T)
+
                 # Inverse of the innovation covariance
                 inv_psi = np.linalg.inv(H @ self.cov @ H.T + R)
                 inv_psi_list.append(inv_psi)
 
             if self.known_lm > 0:
                 pi = ((z_list[1] - z_list[0]).T @ inv_psi_list[0] @ (z_list[1] - z_list[0]))[0, 0]
-                self.test.append(pi)
                 if pi < self.maha_th:
                     j = 0
                 else:

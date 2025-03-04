@@ -22,8 +22,8 @@ def animate(i):
         x = [val[0] for val in robot.landmarks]
         y = [val[1] for val in robot.landmarks]
         ax.scatter(x, y)
-        ax.set_ylim([-2000, 2000])
-        ax.set_xlim([-2000, 2000])
+        ax.set_ylim([-100, 100])
+        ax.set_xlim([0, 500])
 
 ani = animation.FuncAnimation(fig, animate, frames=100, interval=200)
 
