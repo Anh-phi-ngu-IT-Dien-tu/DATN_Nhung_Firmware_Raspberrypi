@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
 import json
 import math
 import numpy as np
@@ -26,8 +27,11 @@ for i in range(len(x)):
 # ak,ck=np.polyfit(np.array(x),np.array(y),1)
 # print(math.atan(ak))
 
+circle = Circle((0, 0), 779.559, fill = False)
+
 plt.scatter(x, y)
 ax=plt.gca()
+ax.add_artist(circle)
 ax.set_xlim(-2000,2000)
 ax.set_ylim(-2000,2000)
 plt.show()

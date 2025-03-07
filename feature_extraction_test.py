@@ -9,9 +9,9 @@ ax = fig.add_subplot(111)
 lidar = MyLidar("/dev/ttyUSB1")
 lidar.start()
 
-robot = FeatureExtraction(min_range=150, max_range=2000, point_dist_threshold=12, min_cluster_size=6, max_cluster_size=25,
+robot = FeatureExtraction(min_range=150, max_range=6000, point_dist_threshold=12, min_cluster_size=6, max_cluster_size=25,
                           avg_angles_lower_bound=np.deg2rad(120), avg_angles_upper_bound=np.deg2rad(160),
-                          std_angles_threshold=np.deg2rad(6.5), min_radius=42, max_radius=47)
+                          std_angles_threshold=np.deg2rad(6), min_radius=42, max_radius=47)
 
 def animate(i):
     scan = lidar.read()
@@ -22,8 +22,8 @@ def animate(i):
         x = [val[0] for val in robot.landmarks]
         y = [val[1] for val in robot.landmarks]
         ax.scatter(x, y)
-        ax.set_ylim([-100, 100])
-        ax.set_xlim([0, 500])
+        ax.set_ylim([-6000, 6000])
+        ax.set_xlim([-6000, 6000])
 
 ani = animation.FuncAnimation(fig, animate, frames=100, interval=200)
 

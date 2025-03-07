@@ -21,7 +21,7 @@ class EkfSlam(FeatureExtraction):
         self.cov = np.zeros((2*max_landmarks + 3, 2*max_landmarks + 3))
         self.cov[0, 0] = 0**2
         self.cov[1, 1] = 0**2
-        self.cov[2, 2] = np.deg2rad(5)**2
+        self.cov[2, 2] = np.deg2rad(1)**2
         for i in range(3, 2*max_landmarks + 3):
             self.cov[i, i] = 1e6
 
@@ -46,7 +46,7 @@ class EkfSlam(FeatureExtraction):
     def transform_global(self, point):
         pr = np.array([[point[0]],
                        [point[1]]])
-        alpha = self.mean[2, 0] + 0.10337803649523618
+        alpha = self.mean[2, 0] + 0.10337803649523618 # lidar 's offset
         T = np.array([[self.mean[0, 0]],
                       [self.mean[1, 0]]])
         R = np.array([[math.cos(alpha), -math.sin(alpha)],

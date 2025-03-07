@@ -50,7 +50,7 @@ class Localization(FeatureExtraction):
     def transform_global(self, point):
         pr = np.array([[point[0]],
                        [point[1]]])
-        alpha = self.mean[2, 0]
+        alpha = self.mean[2, 0] + 0.10337803649523618 # lidar's offset
         T = np.array([[self.mean[0, 0]],
                       [self.mean[1, 0]]])
         R = np.array([[math.cos(alpha), -math.sin(alpha)],

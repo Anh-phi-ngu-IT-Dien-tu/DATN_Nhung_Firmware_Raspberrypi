@@ -32,16 +32,16 @@ mcu = MyMCU("/dev/ttyUSB0", 115200)
 mcu.start()
 
 # Noise parameters
-Q = [0.6, 0.6]
-R = [0.01, np.deg2rad(1)]
+Q = [2.6, 2.6]
+R = [0.004, np.deg2rad(1)]
 
-robot = EkfSlam(min_range=150, max_range=2000, point_dist_threshold=12, min_cluster_size=6, max_cluster_size=25,
-                avg_angles_lower_bound=np.deg2rad(120), avg_angles_upper_bound=np.deg2rad(160), std_angles_threshold=np.deg2rad(6.5),
-                min_radius=42, max_radius=47, max_landmarks=20, Q=Q, R=R, maha_threshold=9, waypoint_min_distance=50)
+robot = EkfSlam(min_range=150, max_range=1800, point_dist_threshold=12, min_cluster_size=6, max_cluster_size=25,
+                avg_angles_lower_bound=np.deg2rad(120), avg_angles_upper_bound=np.deg2rad(160), std_angles_threshold=np.deg2rad(6),
+                min_radius=42, max_radius=47, max_landmarks=20, Q=Q, R=R, maha_threshold=7, waypoint_min_distance=100)
 
-n = 0
-test1 = []
-test2 = []
+# n = 0
+# test1 = []
+# test2 = []
 
 try:
     while True:
@@ -50,9 +50,9 @@ try:
         robot.predict(dr, dl, b)
         scan = lidar.read()
         if len(scan) > 0:
-            test1.append([n, robot.landmarks])
-            test2.append([n, robot.mean[0, 0], robot.mean[1, 0], robot.mean[2, 0]])
-            n += 1
+            # test1.append([n, robot.landmarks])
+            # test2.append([n, robot.mean[0, 0], robot.mean[1, 0], robot.mean[2, 0]])
+            # n += 1
             robot.extract_landmarks(scan)
             robot.correct()
             print(robot.test, "\n")
@@ -64,7 +64,7 @@ except KeyboardInterrupt:
     robot.save_data()
     print(robot.mean)
     print(robot.known_lm)
-    with open("test1.json", "w") as f:
-        json.dump(test1, f)
-    with open("test2.json", "w") as f:
-        json.dump(test2, f)
+    # with open("test1.json", "w") as f:
+    #     json.dump(test1, f)
+    # with open("test2.json", "w") as f:
+    #     json.dump(test2, f)
