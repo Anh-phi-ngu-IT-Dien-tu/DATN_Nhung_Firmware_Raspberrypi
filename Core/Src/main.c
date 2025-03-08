@@ -172,7 +172,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-	HAL_Init();
+  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -223,15 +223,15 @@ int main(void)
 		  timer2_check=0;
 	  }
 	  if(uart2_rx_check==1)
-	  	{
-		  	memcpy(&R,final_rx_buffer2,8);
-	  		uart2_rx_check=0;
-	  	}
-	  	if(uart3_rx_check==1)
-	  	{
-	  		MCU2FrameHandler(uart3_rx_buffer, &R);
-	  		uart3_rx_check=0;
-	  	}
+		{
+			memcpy(&R,final_rx_buffer2,8);
+			uart2_rx_check=0;
+		}
+		if(uart3_rx_check==1)
+		{
+			MCU2FrameHandler(uart3_rx_buffer, &R);
+			uart3_rx_check=0;
+		}
 
   }
   /* USER CODE END 3 */
