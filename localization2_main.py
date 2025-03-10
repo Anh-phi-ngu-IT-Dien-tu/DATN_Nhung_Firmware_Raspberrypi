@@ -41,3 +41,5 @@ except KeyboardInterrupt:
     lidar.stop()
     mcu.write(0,0)
     mcu.stop()
+    print(robot.mean)
+    print(robot.cov)
