@@ -15,18 +15,14 @@
 #include <stdint.h>
 #include "BTS7960_control.h"
 
+#define USING_ULTRASONIC 1
 
 #define WHEEL_RADIUS 32.5
 #define RW_DISTANCE_WHEEL_CENTER 202.75
 #define PI 3.141592654
 
-
-#define STOP_COMMAND_CHARACTER 's'
-#define FORWARD_COMMAND_CHARACTER 'f'
-#define BACKWARD_COMMAND_CHARACTER 'b'
-#define TURN_LEFT_COMMAND_CHARACTER 'l'
-#define TURN_RIGHT_COMMAND_CHARACTER 'r'
-#define SEND_CORRECTION_DATA 'c'
+#define STOP '1'
+#define NO_STOP '0'
 
 
 typedef struct

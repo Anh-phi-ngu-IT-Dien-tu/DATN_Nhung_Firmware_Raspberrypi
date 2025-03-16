@@ -35,8 +35,21 @@ void calculatePredictionValue(Robot_model_typedef *R,float sl,float sr)
  **/
 void CalculateMotorsOmegas(Robot_model_typedef *R,Motor_measurement_command_typedef *M1,Motor_measurement_command_typedef *M2)
 {
+#if USING_ULTRASONIC ==1
+	if(R->ultrasonic_signal==STOP)
+	{
+		M1->expected_rpm=0;
+		M2->expected_rpm=0;
+	}
+	else
+	{
+		M1->expected_rpm=((R->v/(WHEEL_RADIUS))-((RW_DISTANCE_WHEEL_CENTER)*(R->omega/WHEEL_RADIUS)))/(2*PI)*60;
+		M2->expected_rpm=((R->v/(WHEEL_RADIUS))+((RW_DISTANCE_WHEEL_CENTER)*(R->omega/WHEEL_RADIUS)))/(2*PI)*60;
+	}
+#else
 	M1->expected_rpm=((R->v/(WHEEL_RADIUS))-((RW_DISTANCE_WHEEL_CENTER)*(R->omega/WHEEL_RADIUS)))/(2*PI)*60;
 	M2->expected_rpm=((R->v/(WHEEL_RADIUS))+((RW_DISTANCE_WHEEL_CENTER)*(R->omega/WHEEL_RADIUS)))/(2*PI)*60;
+#endif
 }
 
 /**
