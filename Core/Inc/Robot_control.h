@@ -15,7 +15,7 @@
 #include <stdint.h>
 #include "BTS7960_control.h"
 
-#define USING_ULTRASONIC 1
+#define USING_ULTRASONIC 0
 
 #define WHEEL_RADIUS 32.5
 #define RW_DISTANCE_WHEEL_CENTER 202.75
