@@ -3,6 +3,11 @@ from my_lidar import MyLidar
 from my_mcu import MyMCU
 import numpy as np
 import time
+from my_mqtt import MyMQTT
+
+mqtt=MyMQTT()
+mqtt.start()
+
 
 lidar = MyLidar("/dev/ttyUSB1")
 lidar.start()
@@ -36,10 +41,13 @@ try:
         robot.path_tracking()
         # print(robot.linear_vel, robot.turn_vel)
         mcu.write(robot.linear_vel, robot.turn_vel)
+        mqtt.write(robot.mean[0,0],robot.mean[1,0],robot.mean[2,0])
         
 except KeyboardInterrupt:
     lidar.stop()
     mcu.write(0,0)
     mcu.stop()
+    mqtt.stop()
     print(robot.mean)
     print(robot.cov)
+    
