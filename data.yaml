@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 22
+names: ['247', 'Chinsu', 'ChocoPie', 'D.Thanh', 'Heineken', 'Oreo', 'Pepsi-den', 'Pepsi-xanh', 'Redbull', 'Revive-chanh', 'Revive-trang', 'Simply', 'Tea Plus', 'coca', 'coca-chai', 'custas', 'fanta-cam', 'khongdo', 'number1', 'sprite-lon', 'sting', 'vinhhao']
+
+roboflow:
+  workspace: vinh-xf8sl
+  project: data2-ztefj-fuelx
+  version: 14
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/vinh-xf8sl/data2-ztefj-fuelx/dataset/14
