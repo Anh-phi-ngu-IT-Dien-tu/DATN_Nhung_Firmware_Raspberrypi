@@ -69,9 +69,10 @@ class Vision:
                 cv2.putText(self.frame2, label, (x1, y1 - 50), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 1)
 
     
-    def show_result(self):
+    def show_result(self,message=""):
         self.outframe= cv2.resize(self.frame, (800,600))
         self.outframe2= cv2.resize(self.frame2, (800,600))
+        cv2.putText(self.outframe,message,(50,50),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),1)
         cv2.imshow(self.detection_window,self.outframe)
         cv2.imshow(self.oos_window, self.outframe2)
         pass
@@ -162,9 +163,10 @@ class Vision_ESP32:
         
 
 
-    def show_result(self):
+    def show_result(self,message=""):
         self.out_img= cv2.resize(self.img, (800,600))
         self.out_img2= cv2.resize(self.img2, (800,600))
+        cv2.putText(self.out_img,message,(50,50),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),1)
         cv2.imshow(self.detection_window,self.out_img)
         cv2.imshow(self.oos_window, self.out_img2)
         pass

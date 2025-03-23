@@ -2,16 +2,17 @@ import paho.mqtt.client as mqtt
 
 class Robot_MQTT_Position:
 
-    def __init__(self):
+    def __init__(self,host="test.mosquitto.org",port=1883,topic="Robot"):
         self.message=None
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
-        self.client.connect(host="test.mosquitto.org",port=1883)
+        self.client.connect(host=host,port=port)
         self.x=0.0
         self.y=0.0
         self.theta=0.0
         self.temp_message=None
+        self.topic=topic
         pass
 
     def on_connect(self,client, userdata, flags, rc):
@@ -19,7 +20,7 @@ class Robot_MQTT_Position:
         # Subscribing in on_connect() - if we lose the connection and
         # reconnect then subscriptions will be renewed.
         # topic
-        client.subscribe("Robot")
+        client.subscribe(self.topic)
         
     # The callback for when a PUBLISH message is received from the server.
     def on_message(self,client, userdata, msg):
@@ -34,7 +35,9 @@ class Robot_MQTT_Position:
         except:
             pass
 
-        
+    
+    def publish(self,topic="Robot",message=""):
+        self.client.publish(topic, message)
 
     def start_mqtt(self):
         self.client.loop_start()
