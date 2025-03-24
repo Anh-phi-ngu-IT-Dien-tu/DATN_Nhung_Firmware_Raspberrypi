@@ -3,13 +3,11 @@ import numpy as np
 import urllib.request
 from ultralytics import YOLO
 import threading
-import random
-import json
 import copy
-import time
+
 
 class Vision:
-    def __init__(self,camera_source=0,detetion_model="yolo11n.pt",out_of_stock_model="yolo11n.pt",detection_confidence=0.6,out_of_stock_confindence=0.45,detection_window_title="Detection",out_of_stock_window_title="Out_of_stock",json_file='Data.json'):
+    def __init__(self,camera_source=0,detetion_model="yolo11n.pt",out_of_stock_model="yolo11n.pt",detection_confidence=0.6,out_of_stock_confindence=0.45,detection_window_title="Detection",out_of_stock_window_title="Out_of_stock"):
         self.camera_source=camera_source
         self.detection_model=YOLO(detetion_model)
         self.oos_model=YOLO(out_of_stock_model)
@@ -21,10 +19,17 @@ class Vision:
         self.outframe=None
         self.outframe2=None
         self.ret=None
-        self.color = [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(22)]
+        self.color = [
+    (255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (255, 0, 255),
+    (0, 255, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128), (128, 128, 0),
+    (128, 0, 128), (0, 128, 128), (64, 0, 0), (0, 64, 0), (0, 0, 64),
+    (64, 64, 0), (64, 0, 64), (0, 64, 64), (192, 0, 0), (0, 192, 0),
+    (0, 0, 192), (192, 192, 0)
+]
         self.detection_window=detection_window_title
         self.oos_window=out_of_stock_window_title
-        self.json_file=json_file
+        self.labels1=None
+        self.labels2=None
         self.run=False
         # self.thread=threading.Thread(target=self.process_agorithm)
         self.t2=threading.Thread(target=self.Vision_Thread,daemon=True)
@@ -35,6 +40,7 @@ class Vision:
         self.frame2=copy.deepcopy(self.frame)
 
     def Vision_Model(self):
+        self.labels1=[]
         results=self.detection_model(self.frame,conf=self.detection_conf)
         for result in results:
             for box in result.boxes:
@@ -46,8 +52,9 @@ class Vision:
                 # Draw bounding boxes and labels on the camera frame
                 cv2.rectangle(self.frame, (x1, y1), (x2, y2), color, 2)
                 cv2.putText(self.frame, label, (x1, y1 - 50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, color, 2)
+                self.labels1.append(label)
 
-
+        self.labels2=[]
         result_oos = self.oos_model(self.frame2,conf=self.oos_conf)
         for result in result_oos:
             for box in result.boxes:
@@ -67,6 +74,7 @@ class Vision:
                 # Vẽ bounding box và label với màu tương ứng
                 cv2.rectangle(self.frame2, (x1, y1), (x2, y2), color, 2)
                 cv2.putText(self.frame2, label, (x1, y1 - 50), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 1)
+                self.labels2.append(label)
 
     
     def show_result(self,message=""):
@@ -98,7 +106,7 @@ class Vision:
 
 
 class Vision_ESP32:
-    def __init__(self,esp_32_url="http://192.168.137.161/capture",detetion_model="yolo11n.pt",out_of_stock_model="yolo11n.pt",detection_threshold_confidence=0.6,out_of_stock_confidence=0.4,detection_window_title="ESP32_Detection",out_of_stock_window_title="ESP32_Out_of_stock",json_file='Data.json'):
+    def __init__(self,esp_32_url="http://192.168.137.161/capture",detetion_model="yolo11n.pt",out_of_stock_model="yolo11n.pt",detection_threshold_confidence=0.6,out_of_stock_confidence=0.4,detection_window_title="ESP32_Detection",out_of_stock_window_title="ESP32_Out_of_stock"):
         self.url=esp_32_url
         self.detection_model=YOLO(detetion_model)
         self.oos_model=YOLO(out_of_stock_model)
@@ -114,7 +122,8 @@ class Vision_ESP32:
         self.out_img2=None
         self.detection_window=detection_window_title
         self.oos_window=out_of_stock_window_title
-        self.json_file=json_file
+        self.labels1=None
+        self.labels2=None
         self.run=False
         self.t2=threading.Thread(target=self.ESP32_Vision_Thread,daemon=True)
         self.i=0
@@ -128,6 +137,7 @@ class Vision_ESP32:
         self.img2=copy.deepcopy(self.img)
 
     def ESP32_Vision_Model(self):
+        self.labels1=[]
         results=self.detection_model(self.img,conf=self.detection_conf)
         for result in results:
             for box in result.boxes:
@@ -138,8 +148,10 @@ class Vision_ESP32:
                 # Draw bounding boxes and labels on the camera frame
                 cv2.rectangle(self.img, (x1, y1), (x2, y2), (255,0,0), 2)
                 cv2.putText(self.img, label, (x1, y1 - 50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255,0,0), 2)
+                self.labels1.append(label)
 
 
+        self.labels2=[]
         result_oos = self.oos_model(self.img2,conf=self.oos_conf)
         for result in result_oos:
             for box in result.boxes:
@@ -159,6 +171,7 @@ class Vision_ESP32:
                 # Vẽ bounding box và label với màu tương ứng
                 cv2.rectangle(self.img2, (x1, y1), (x2, y2), color, 2)
                 cv2.putText(self.img2, label, (x1, y1 - 50), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 1)
+                self.labels2.append(label)
 
         
 

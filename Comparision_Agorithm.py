@@ -3,9 +3,51 @@ import json
 
 
 class Shelf:
-    def __init__(self,Shelf={""}):
-            self.Shelf=Shelf   
+    def __init__(self,shelf={"object1","object2","object3"},shelf_id=1):
+        self.shelf=shelf
+        self.shelf_id=shelf_id
+        self.file_name=f"Wrong_object_in_shelf_{shelf_id}.json"
+        self.file_data=[]
+        self.condition=False
+        with open(self.file_name,"w") as outfile:
+            json.dump(self.file_data,outfile)
+        pass
+
+    def shelf_object_comparision(self,id,label,x,y,theta):
+        if id==self.shelf_id:
+            if label in self.shelf:
+                pass
+            else:
+                with open(self.file_name,"r") as file:
+                    self.file_data=json.load(file)
+                if self.file_data == []:
+                    with open(self.file_name,"w") as outfile:
+                        dictionary={"object":label,
+                                    "x":x,
+                                    "y":y,
+                                    "theta":theta}
+                        self.file_data.append(dictionary)
+                        json.dump(self.file_data,outfile,indent=4)
+                else:
+                    for dictionary in self.file_data:
+                        if dictionary["object"]==label:
+                            self.condition=False
+                            break
+                        else:
+                            self.condition=True
+                    if self.condition==True:
+                        with open(self.file_name,"w") as outfile:
+                            dictionary={"object":label,
+                                        "x":x,
+                                        "y":y,
+                                        "theta":theta}
+                            self.file_data.append(dictionary)
+                            json.dump(self.file_data,outfile,indent=4)                     
+        else:
             pass
+
+    
+    
 
 class Shelf_Position:
     def __init__(self,x_below=0.0,x_above=0.0,y_below=0.0,y_above=0.0,theta_below=0.0,theta_above=0.0):
