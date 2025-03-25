@@ -5,7 +5,7 @@ import numpy as np
 import time
 from my_mqtt import MyMQTT
 
-mqtt=MyMQTT()
+mqtt=MyMQTT(broker="broker.emqx.io")
 mqtt.start()
 
 
