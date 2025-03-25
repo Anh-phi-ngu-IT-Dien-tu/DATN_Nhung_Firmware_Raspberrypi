@@ -33,8 +33,8 @@ Shelf1_pos=Shelf_Position(1000,1300,-1700,-500,-1.7,-1.3)
 Shelf2_pos=Shelf_Position(-800,-500,-600,-100,1.4,1.8)
 allow_model=0
 
-above_cam=Vision(0,"stockv14.pt","oosv8_20.3.pt",0.6,0.45)
-below_cam=Vision(2,"stockv14.pt","oosv8_20.3.pt",0.6,0.45,"Detection2","Out_of_stock_2")
+above_cam=Vision_ESP32("","stockv14.pt","oosv8_20.3.pt",0.6,0.45,"Above_detection","Above_Out_of_stock")
+below_cam=Vision_ESP32("","stockv14.pt","oosv8_20.3.pt",0.6,0.45,"Below_detection","Below_Out_of_stock")
 
 Robot_Pos=Robot_MQTT_Position()
 Robot_Pos.start_mqtt()
@@ -58,7 +58,7 @@ def Cam1():
         below_cam.Capture_frame()
         Shelf_Pos_Compare()
         if allow_model==1 or allow_model ==2:
-            below_cam.Vision_Model()
+            below_cam.ESP32_Vision_Model()
             for label in below_cam.labels1:
                 Shelf1_1.shelf_object_comparision(allow_model,label,Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta)
             
@@ -74,7 +74,7 @@ def Cam2():
     while True:
         above_cam.Capture_frame()
         if allow_model==1 or allow_model ==2:
-            above_cam.Vision_Model()
+            above_cam.ESP32_Vision_Model()
             for label in above_cam.labels1:
                 Shelf1_2.shelf_object_comparision(allow_model,label,Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta)
         
