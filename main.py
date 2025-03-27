@@ -34,12 +34,14 @@ Shelf2_pos=Shelf_Position(-800,-500,-600,-100,1.4,1.8)
 allow_model=0
 allow_cam1=0
 allow_cam2=0
+break_thread=False
 
 above_cam=Vision_ESP32("http://192.168.137.24/capture","stockv14.pt","oosv8_20.3.pt",0.6,0.45,"Above_detection","Above_Out_of_stock")
 below_cam=Vision_ESP32("http://192.168.137.166/capture","stockv14.pt","oosv8_20.3.pt",0.6,0.45,"Below_detection","Below_Out_of_stock")
 
 Robot_Pos=Robot_MQTT_Position(host="broker.emqx.io")
 Robot_Pos.start_mqtt()
+
 
 
 def Shelf_Pos_Compare():
@@ -63,15 +65,17 @@ def Cam1():
             Shelf_Pos_Compare()
             if allow_model==1 or allow_model ==2:
                 below_cam.ESP32_Vision_Model()
-                # for label in below_cam.labels1:
-                #     Shelf1_1.shelf_object_comparision(allow_model,label,Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta)
+                for label in below_cam.labels1:
+                    Shelf1_1.shelf_object_comparision(allow_model,label,Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta)
                 
 
             print_out=f"{Robot_Pos.message} Shelf {allow_model}"
             below_cam.show_result(print_out)
-            if cv2.waitKey(1)==ord('q'):
+            if break_thread==True:
+                Shelf1_1.write_data_to_json()
                 break
             continue
+           
         allow_cam1+=1
             
    
@@ -84,26 +88,36 @@ def Cam2():
         if allow_cam2>10:
             if allow_model==1 or allow_model ==2:
                 above_cam.ESP32_Vision_Model()
-                # for label in above_cam.labels1:
-                #     Shelf1_2.shelf_object_comparision(allow_model,label,Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta)
+                for label in above_cam.labels1:
+                    Shelf1_2.shelf_object_comparision(allow_model,label,Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta)
             
             above_cam.show_result()
-            if cv2.waitKey(1)==ord('q'):
+            if break_thread==True:
+                Shelf1_2.write_data_to_json()
                 break
             continue
         allow_cam2+=1    
     
 
+def BreakCv2():
+    global break_thread
+    while True:
+        if cv2.waitKey(1)==ord('q'):
+            break_thread=True
+            break
+            
+
 t1=threading.Thread(target=Cam1,daemon=True)
 t2=threading.Thread(target=Cam2,daemon=True)
-
+t3=threading.Thread(target=BreakCv2,daemon=True)
 
 t1.start()
 t2.start()
-
+t3.start()
 
 t1.join()
 t2.join()
+t3.join()
 
 
 cv2.destroyAllWindows()

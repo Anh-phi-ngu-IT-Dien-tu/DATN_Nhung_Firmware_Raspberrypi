@@ -17,34 +17,25 @@ class Shelf:
         if id==self.shelf_id:
             if label in self.shelf:
                 pass
-            else:
-                with open(self.file_name,"r") as file:
-                    self.file_data=json.load(file)
-                if self.file_data == []:
-                    with open(self.file_name,"w") as outfile:
-                        dictionary={"object":label,
-                                    "x":x,
-                                    "y":y,
-                                    "theta":theta}
-                        self.file_data.append(dictionary)
-                        json.dump(self.file_data,outfile,indent=4)
-                else:
-                    for dictionary in self.file_data:
-                        if dictionary["object"]==label:
-                            self.condition=False
-                            break
-                        else:
-                            self.condition=True
-                    if self.condition==True:
-                        with open(self.file_name,"w") as outfile:
-                            dictionary={"object":label,
-                                        "x":x,
-                                        "y":y,
-                                        "theta":theta}
-                            self.file_data.append(dictionary)
-                            json.dump(self.file_data,outfile,indent=4)                     
+            else:        
+                for dictionary in self.file_data:
+                    if dictionary["object"]==label:
+                        self.condition=False
+                        break
+                    else:
+                        self.condition=True
+                if self.condition==True:
+                    dictionary={"object":label,
+                                "x":x,
+                                "y":y,
+                                "theta":theta}
+                    self.file_data.append(dictionary)
         else:
             pass
+
+    def write_data_to_json(self):
+        with open(self.file_name,"w") as outfile:
+            json.dump(self.file_data,outfile)
 
     
     
