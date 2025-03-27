@@ -48,11 +48,12 @@ class Vision:
                 conf = box.conf[0].item()
                 cls = int(box.cls[0].item())
                 label = f"{self.detection_model.names[cls]}: {conf:.2f}"
+                class_name=f"{self.detection_model.names[cls]}"
                 color=self.color[cls]
                 # Draw bounding boxes and labels on the camera frame
                 cv2.rectangle(self.frame, (x1, y1), (x2, y2), color, 2)
                 cv2.putText(self.frame, label, (x1, y1 - 50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, color, 2)
-                self.labels1.append(label)
+                self.labels1.append(class_name)
 
         self.labels2=[]
         result_oos = self.oos_model(self.frame2,conf=self.oos_conf)
@@ -62,7 +63,7 @@ class Vision:
                 conf = box.conf[0].item()
                 cls = int(box.cls[0].item())
                 label = f"{self.oos_model.names[cls]}: {conf:.2f}"
-
+                class_name=f"{self.detection_model.names[cls]}"
                 # Gán màu cho từng lớp
                 if self.oos_model.names[cls] == 'oos':
                     color = (0, 255, 0)  # Màu xanh cho oos
@@ -74,7 +75,7 @@ class Vision:
                 # Vẽ bounding box và label với màu tương ứng
                 cv2.rectangle(self.frame2, (x1, y1), (x2, y2), color, 2)
                 cv2.putText(self.frame2, label, (x1, y1 - 50), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 1)
-                self.labels2.append(label)
+                self.labels2.append(class_name)
 
     
     def show_result(self,message=""):
@@ -145,10 +146,11 @@ class Vision_ESP32:
                 conf = box.conf[0].item()
                 cls = int(box.cls[0].item())
                 label = f"{self.detection_model.names[cls]}: {conf:.2f}"
+                class_name=f"{self.detection_model.names[cls]}"
                 # Draw bounding boxes and labels on the camera frame
                 cv2.rectangle(self.img, (x1, y1), (x2, y2), (255,0,0), 2)
                 cv2.putText(self.img, label, (x1, y1 - 50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255,0,0), 2)
-                self.labels1.append(label)
+                self.labels1.append(class_name)
 
 
         self.labels2=[]
@@ -159,7 +161,7 @@ class Vision_ESP32:
                 conf = box.conf[0].item()
                 cls = int(box.cls[0].item())
                 label = f"{self.oos_model.names[cls]}: {conf:.2f}"
-
+                class_name=f"{self.detection_model.names[cls]}"
                 # Gán màu cho từng lớp
                 if self.oos_model.names[cls] == 'oos':
                     color = (0, 255, 0)  # Màu xanh cho oos
@@ -171,7 +173,7 @@ class Vision_ESP32:
                 # Vẽ bounding box và label với màu tương ứng
                 cv2.rectangle(self.img2, (x1, y1), (x2, y2), color, 2)
                 cv2.putText(self.img2, label, (x1, y1 - 50), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 1)
-                self.labels2.append(label)
+                self.labels2.append(class_name)
 
         
 

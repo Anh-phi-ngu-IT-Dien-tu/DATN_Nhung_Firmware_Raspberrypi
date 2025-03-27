@@ -34,10 +34,10 @@ Shelf2_pos=Shelf_Position(-800,-500,-600,-100,1.4,1.8)
 allow_model=0
 allow_cam1=0
 allow_cam2=0
-break_thread=False
+break_threading=0
 
-above_cam=Vision_ESP32("http://192.168.137.24/capture","stockv14.pt","oosv8_20.3.pt",0.6,0.45,"Above_detection","Above_Out_of_stock")
-below_cam=Vision_ESP32("http://192.168.137.166/capture","stockv14.pt","oosv8_20.3.pt",0.6,0.45,"Below_detection","Below_Out_of_stock")
+above_cam=Vision(0,"stockv14.pt","oosv8_20.3.pt",0.6,0.45,"Above_detection","Above_Out_of_stock")
+below_cam=Vision(2,"stockv14.pt","oosv8_20.3.pt",0.6,0.45,"Below_detection","Below_Out_of_stock")
 
 Robot_Pos=Robot_MQTT_Position(host="broker.emqx.io")
 Robot_Pos.start_mqtt()
@@ -59,23 +59,23 @@ def Shelf_Pos_Compare():
 def Cam1():
     global allow_model
     global allow_cam1
-    global break_thread
+    global break_threading
     while True:
         below_cam.Capture_frame()
         if allow_cam1>10:
             Shelf_Pos_Compare()
             if allow_model==1 or allow_model ==2:
-                below_cam.ESP32_Vision_Model()
+                below_cam.Vision_Model()
                 for label in below_cam.labels1:
                     Shelf1_1.shelf_object_comparision(allow_model,label,Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta)
-
+                    
                 
 
             print_out=f"{Robot_Pos.message} Shelf {allow_model}"
             below_cam.show_result(print_out)
             if cv2.waitKey(1)==ord('q'):
                 Shelf1_1.write_data_to_json()
-                break_thread=True
+                break_threading=1
                 break
             continue
            
@@ -86,22 +86,24 @@ def Cam1():
 def Cam2():
     global allow_model
     global allow_cam2
-    global break_thread
+    global break_threading
     while True:
         above_cam.Capture_frame()
         if allow_cam2>10:
             if allow_model==1 or allow_model ==2:
-                above_cam.ESP32_Vision_Model()
+                above_cam.Vision_Model()
                 for label in above_cam.labels1:
                     Shelf1_2.shelf_object_comparision(allow_model,label,Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta)
             
             above_cam.show_result()
-            if cv2.waitKey(1)==ord('q') or break_thread==True:
+            if cv2.waitKey(1)==ord('q') or break_threading==1:
                 Shelf1_2.write_data_to_json()
                 break
             continue
         allow_cam2+=1    
-                
+    
+
+            
 
 t1=threading.Thread(target=Cam1,daemon=True)
 t2=threading.Thread(target=Cam2,daemon=True)
@@ -111,9 +113,9 @@ t1.start()
 t2.start()
 
 
+
 t1.join()
 t2.join()
-
 
 
 cv2.destroyAllWindows()

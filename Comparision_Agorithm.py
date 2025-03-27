@@ -3,10 +3,11 @@ import json
 
 
 class Shelf:
-    def __init__(self,shelf={"object1","object2","object3"},shelf_id=1):
+    def __init__(self,shelf={"object1","object2","object3"},shelf_id=1,shelf_name="shelf1_1"):
         self.shelf=shelf
+        self.shelf_name=shelf_name
         self.shelf_id=shelf_id
-        self.file_name=f"Wrong_object_in_shelf_{shelf_id}.json"
+        self.file_name=f"Wrong_object_in_{self.shelf_name}.json"
         self.file_data=[]
         self.condition=False
         with open(self.file_name,"w") as outfile:
@@ -16,8 +17,17 @@ class Shelf:
     def shelf_object_comparision(self,id,label,x,y,theta):
         if id==self.shelf_id:
             if label in self.shelf:
+                print(f"label {label} in shelf {self.shelf_name}")
                 pass
-            else:        
+            else:    
+                if self.file_data==[]:
+                    temp_dictionary={"object":label,
+                                "x":x,
+                                "y":y,
+                                "theta":theta}
+                    self.file_data.append(temp_dictionary)
+                    return
+                        
                 for dictionary in self.file_data:
                     if dictionary["object"]==label:
                         self.condition=False
@@ -25,17 +35,17 @@ class Shelf:
                     else:
                         self.condition=True
                 if self.condition==True:
-                    dictionary={"object":label,
+                    temp_dictionary={"object":label,
                                 "x":x,
                                 "y":y,
                                 "theta":theta}
-                    self.file_data.append(dictionary)
+                    self.file_data.append(temp_dictionary)
         else:
             pass
 
     def write_data_to_json(self):
         with open(self.file_name,"w") as outfile:
-            json.dump(self.file_data,outfile)
+            json.dump(self.file_data,outfile,indent=4)
 
     
     
