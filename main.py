@@ -10,7 +10,7 @@ Shelf1_1=Shelf({'247', 'Chinsu', 'ChocoPie', 'D.Thanh', 'Heineken', 'Oreo'},1,"s
 Shelf1_2=Shelf({'Pepsi-den', 'Pepsi-xanh', 'Redbull', 'Revive-chanh', 'Revive-trang', 'Simply', 'Tea Plus'},1,"shelf1_2")
 
 Shelf1_pos=Shelf_Position(1000,1300,-1700,-500,-1.7,-1.3)
-Shelf2_pos=Shelf_Position(-800,-500,-600,-100,1.4,1.8)
+Shelf2_pos=Shelf_Position(-800,-500,-1000,-150,1.4,1.8)
 allow_model=0
 allow_cam1=0
 allow_cam2=0

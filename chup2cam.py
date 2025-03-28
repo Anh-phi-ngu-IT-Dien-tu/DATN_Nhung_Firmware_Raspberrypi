@@ -5,8 +5,8 @@ import os
 import re
 
 # IP stream URLs của hai camera
-urlL = "http://192.168.137.166/capture"      # Camera trái
-urlR = "http://192.168.137.24/capture"      # Camera phải
+urlL = "http://192.168.137.206/capture"      # Camera trái
+urlR = "http://192.168.137.202/capture"      # Camera phải
 
 # Tạo thư mục lưu ảnh nếu chưa tồn tại
 os.makedirs('images/trai', exist_ok=True)
