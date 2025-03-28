@@ -123,6 +123,13 @@ class Vision_ESP32:
         self.out_img2=None
         self.detection_window=detection_window_title
         self.oos_window=out_of_stock_window_title
+        self.color = [
+    (255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (255, 0, 255),
+    (0, 255, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128), (128, 128, 0),
+    (128, 0, 128), (0, 128, 128), (64, 0, 0), (0, 64, 0), (0, 0, 64),
+    (64, 64, 0), (64, 0, 64), (0, 64, 64), (192, 0, 0), (0, 192, 0),
+    (0, 0, 192), (192, 192, 0)
+]
         self.labels1=None
         self.labels2=None
         self.run=False
@@ -147,9 +154,11 @@ class Vision_ESP32:
                 cls = int(box.cls[0].item())
                 label = f"{self.detection_model.names[cls]}: {conf:.2f}"
                 class_name=f"{self.detection_model.names[cls]}"
+
                 # Draw bounding boxes and labels on the camera frame
-                cv2.rectangle(self.img, (x1, y1), (x2, y2), (255,0,0), 2)
-                cv2.putText(self.img, label, (x1, y1 - 50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255,0,0), 2)
+                color=self.color[cls]
+                cv2.rectangle(self.img, (x1, y1), (x2, y2), color, 2)
+                cv2.putText(self.img, label, (x1, y1 - 50), cv2.FONT_HERSHEY_SIMPLEX, 1.5,color, 2)
                 self.labels1.append(class_name)
 
 
