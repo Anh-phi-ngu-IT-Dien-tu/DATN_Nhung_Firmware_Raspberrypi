@@ -16,8 +16,8 @@ allow_cam1=0
 allow_cam2=0
 break_thread=False
 
-above_cam=Vision_ESP32("http://192.168.137.24/capture","stockv14.pt","oosv8_20.3.pt",0.6,0.45,"Above_detection","Above_Out_of_stock")
-below_cam=Vision_ESP32("http://192.168.137.166/capture","stockv14.pt","oosv8_20.3.pt",0.6,0.45,"Below_detection","Below_Out_of_stock")
+above_cam=Vision_ESP32("http://192.168.137.24/capture","stockv17.pt","oosv8_20.3.pt",0.6,0.45,"Above_detection","Above_Out_of_stock")
+below_cam=Vision_ESP32("http://192.168.137.166/capture","stockv17.pt","oosv8_20.3.pt",0.6,0.45,"Below_detection","Below_Out_of_stock")
 
 Robot_Pos=Robot_MQTT_Position(host="broker.emqx.io")
 Robot_Pos.start_mqtt()
