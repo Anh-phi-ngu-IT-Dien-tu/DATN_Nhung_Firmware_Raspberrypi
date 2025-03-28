@@ -10,8 +10,8 @@
 // ===========================
 // 🔹 Nhập WiFi Credentials
 // ===========================
-const char *ssid = "LAPTOP-Phi";
-const char *password = "Phi18112003Laptop";
+const char *ssid = "LAPTOPNITRO";
+const char *password = "07072003";
 
 void startCameraServer();
 void setupLedFlash(int pin);

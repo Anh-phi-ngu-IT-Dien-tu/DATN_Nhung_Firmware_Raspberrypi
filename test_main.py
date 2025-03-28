@@ -5,27 +5,6 @@ from Comparision_Agorithm import *
 from robot_mqtt import Robot_MQTT_Position 
 
 
-
-# below_cam=Vision_ESP32("http://192.168.137.124/capture","stockv14.pt","oosv8_20.3.pt",0.6,0.45)
-
-# #test comparision
-# Shelf1=Shelf({"247", "Chinsu", "ChocoPie", "D.Thanh", "Heineken", "Oreo"},1)
-
-# Shelf1.shelf_object_comparision(1,'Pepsi-xanh',0,0,0)
-# Shelf1.shelf_object_comparision(2,'ChocoPie',10,0,0)
-# Shelf1.shelf_object_comparision(1,'ChocoPie',10,100,1)
-# Shelf1.shelf_object_comparision(1,'Pepsi-xanh',10,150,1)
-# Shelf1.shelf_object_comparision(1,'Pespi-den',30,-50,1)
-
-
-# # Open and read the JSON file
-# with open('Wrong_object_in_shelf_1.json', 'r') as file:
-#     data = json.load(file)
-
-# # Print the data
-# print(data)
-
-
 Shelf1_1=Shelf({'247', 'Chinsu', 'ChocoPie', 'D.Thanh', 'Heineken', 'Oreo'},1,"shelf1_1")
 Shelf1_2=Shelf({'Pepsi-den', 'Pepsi-xanh', 'Redbull', 'Revive-chanh', 'Revive-trang', 'Simply', 'Tea Plus'},1,"shelf1_2")
 
