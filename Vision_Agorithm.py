@@ -28,8 +28,8 @@ class Vision:
 ]
         self.detection_window=detection_window_title
         self.oos_window=out_of_stock_window_title
-        self.labels1=None
-        self.labels2=None
+        self.label1_dict=None
+        self.label2_dict=None
         self.run=False
         # self.thread=threading.Thread(target=self.process_agorithm)
         self.t2=threading.Thread(target=self.Vision_Thread,daemon=True)
@@ -40,7 +40,7 @@ class Vision:
         self.frame2=copy.deepcopy(self.frame)
 
     def Vision_Model(self):
-        self.labels1=[]
+        self.label1_dict=[]
         results=self.detection_model(self.frame,conf=self.detection_conf)
         for result in results:
             for box in result.boxes:
@@ -53,9 +53,13 @@ class Vision:
                 # Draw bounding boxes and labels on the camera frame
                 cv2.rectangle(self.frame, (x1, y1), (x2, y2), color, 2)
                 cv2.putText(self.frame, label, (x1, y1 - 50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, color, 2)
-                self.labels1.append(class_name)
+                temp_dict={
+                    "object":class_name,
+                    "coordinate":np.array([x1,y1,x2,y2])
+                }
+                self.label1_dict.append(temp_dict)
 
-        self.labels2=[]
+        self.label2_dict=[]
         result_oos = self.oos_model(self.frame2,conf=self.oos_conf)
         for result in result_oos:
             for box in result.boxes:
@@ -75,7 +79,11 @@ class Vision:
                 # Vẽ bounding box và label với màu tương ứng
                 cv2.rectangle(self.frame2, (x1, y1), (x2, y2), color, 2)
                 cv2.putText(self.frame2, label, (x1, y1 - 50), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 1)
-                self.labels2.append(class_name)
+                temp_dict={
+                    "stock stage":class_name,
+                    "coordinate":np.array([x1,y1,x2,y2])
+                }
+                self.label2_dict.append(temp_dict)
 
     
     def show_result(self,message=""):
@@ -130,8 +138,8 @@ class Vision_ESP32:
     (64, 64, 0), (64, 0, 64), (0, 64, 64), (192, 0, 0), (0, 192, 0),
     (0, 0, 192), (192, 192, 0)
 ]
-        self.labels1=None
-        self.labels2=None
+        self.label1_dict=None
+        self.label2_dict=None
         self.run=False
         self.t2=threading.Thread(target=self.ESP32_Vision_Thread,daemon=True)
         self.i=0
@@ -145,7 +153,7 @@ class Vision_ESP32:
         self.img2=copy.deepcopy(self.img)
 
     def ESP32_Vision_Model(self):
-        self.labels1=[]
+        self.label1_dict=[]
         results=self.detection_model(self.img,conf=self.detection_conf)
         for result in results:
             for box in result.boxes:
@@ -159,10 +167,14 @@ class Vision_ESP32:
                 color=self.color[cls]
                 cv2.rectangle(self.img, (x1, y1), (x2, y2), color, 2)
                 cv2.putText(self.img, label, (x1, y1 - 50), cv2.FONT_HERSHEY_SIMPLEX, 1.5,color, 2)
-                self.labels1.append(class_name)
+                temp_dict={
+                    "object":class_name,
+                    "coordinate":np.array([x1,y1,x2,y2])
+                }
+                self.label1_dict.append(temp_dict)
 
 
-        self.labels2=[]
+        self.label2_dict=[]
         result_oos = self.oos_model(self.img2,conf=self.oos_conf)
         for result in result_oos:
             for box in result.boxes:
@@ -182,10 +194,11 @@ class Vision_ESP32:
                 # Vẽ bounding box và label với màu tương ứng
                 cv2.rectangle(self.img2, (x1, y1), (x2, y2), color, 2)
                 cv2.putText(self.img2, label, (x1, y1 - 50), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 1)
-                self.labels2.append(class_name)
-
-        
-
+                temp_dict={
+                    "stock stage":class_name,
+                    "coordinate":np.array([x1,y1,x2,y2])
+                }
+                self.label2_dict.append(temp_dict)
 
     def show_result(self,message=""):
         self.out_img= cv2.resize(self.img, (800,600))

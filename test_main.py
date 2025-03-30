@@ -16,7 +16,7 @@ allow_cam2=0
 break_threading=0
 
 above_cam=Vision(0,"stockv14.pt","oosv8_20.3.pt",0.6,0.45,"Above_detection","Above_Out_of_stock")
-below_cam=Vision(2,"stockv14.pt","oosv8_20.3.pt",0.6,0.45,"Below_detection","Below_Out_of_stock")
+below_cam=Vision(1,"stockv14.pt","oosv8_20.3.pt",0.6,0.45,"Below_detection","Below_Out_of_stock")
 
 Robot_Pos=Robot_MQTT_Position(host="broker.emqx.io")
 Robot_Pos.start_mqtt()
@@ -45,9 +45,10 @@ def Cam1():
             Shelf_Pos_Compare()
             if allow_model==1 or allow_model ==2:
                 below_cam.Vision_Model()
-                for label in below_cam.labels1:
-                    Shelf1_1.shelf_object_comparision(allow_model,label,Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta)
-                    
+                for dictionary in below_cam.label1_dict:
+                    Shelf1_1.shelf_object_comparision(allow_model,dictionary["object"],Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta)
+                    for soos_dictionary in below_cam.label2_dict:
+                        Shelf1_1.semi_out_of_stock_object(allow_model,dictionary["object"],dictionary["coordinate"],soos_dictionary["stock stage"],soos_dictionary["coordinate"],Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta,0.7)
                 
 
             print_out=f"{Robot_Pos.message} Shelf {allow_model}"
@@ -71,9 +72,11 @@ def Cam2():
         if allow_cam2>10:
             if allow_model==1 or allow_model ==2:
                 above_cam.Vision_Model()
-                for label in above_cam.labels1:
-                    Shelf1_2.shelf_object_comparision(allow_model,label,Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta)
-            
+                for dictionary in above_cam.label1_dict:
+                    Shelf1_2.shelf_object_comparision(allow_model,dictionary["object"],Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta)
+                    for soos_dictionary in below_cam.label2_dict:
+                        Shelf1_2.semi_out_of_stock_object(allow_model,dictionary["object"],dictionary["coordinate"],soos_dictionary["stock stage"],soos_dictionary["coordinate"],Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta,0.7)
+
             above_cam.show_result()
             if cv2.waitKey(1)==ord('q') or break_threading==1:
                 Shelf1_2.write_data_to_json()

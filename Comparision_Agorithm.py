@@ -8,10 +8,15 @@ class Shelf:
         self.shelf_name=shelf_name
         self.shelf_id=shelf_id
         self.file_name=f"Wrong_object_in_{self.shelf_name}.json"
-        self.file_data=[]
+        self.oos_file_name=f"Semi_out_of_stock_report_in_{self.shelf_name}.json"
+        self.file_data=[]#contains wrong object in shelf
+        self.oos_file_data=[]#contain object that semi out of stock
         self.condition=False
+        self.semi_condition=False
         with open(self.file_name,"w") as outfile:
             json.dump(self.file_data,outfile)
+        with open(self.oos_file_name,"w") as outfile:
+            json.dump(self.oos_file_data,outfile)
         pass
 
     def shelf_object_comparision(self,id,label,x,y,theta):
@@ -42,11 +47,61 @@ class Shelf:
                     self.file_data.append(temp_dictionary)
         else:
             pass
+    #x1,y1,x2,y2
+    def semi_out_of_stock_object(self,id,label,object_coordinate,soos_label,soos_coordinate,x,y,theta,threshold=0.5):
+        if id==self.shelf_id:
+
+            if soos_label=='semi-oos':
+                for dictionary in self.file_data:
+                    if dictionary["object"]==label:
+                        self.semi_condition=False
+                        break
+                    else:
+                        self.semi_condition=True
+                
+                if self.semi_condition==True:
+                    
+                    x1_1, y1_1, x2_1, y2_1 = object_coordinate
+                    x1_2, y1_2, x2_2, y2_2 = soos_coordinate
+
+                    # Calculate overlap area
+                    overlap_x1 = max(x1_1, x1_2)
+                    overlap_y1 = max(y1_1, y1_2)
+                    overlap_x2 = min(x2_1, x2_2)
+                    overlap_y2 = min(y2_1, y2_2)
+
+                    if overlap_x1 < overlap_x2 and overlap_y1 < overlap_y2:
+                        overlap_area = (overlap_x2 - overlap_x1) * (overlap_y2 - overlap_y1)
+                    else:
+                        overlap_area=0.0
+                    
+                    object_area=(x2_1-x1_1)*(y2_1-y1_1)
+
+                    overlap_object=overlap_area/object_area
+
+                    if overlap_object>=threshold:
+                        temp={
+                            "object":label,
+                            "x":x,
+                            "y":y,
+                            "theta":theta
+                        }
+                        self.oos_file_data.append(temp)
+
+                pass
+
+            pass
+        
+        else:
+            pass
 
     def write_data_to_json(self):
         with open(self.file_name,"w") as outfile:
             json.dump(self.file_data,outfile,indent=4)
-
+        with open(self.oos_file_name,"w") as outfile:
+            json.dump(self.oos_file_data,outfile,indent=4)
+        
+        
     
     
 

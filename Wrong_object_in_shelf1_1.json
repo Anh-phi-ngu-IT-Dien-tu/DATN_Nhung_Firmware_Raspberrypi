@@ -1,14 +1,14 @@
 [
     {
-        "object": "TH true Milk",
-        "x": 1175.0,
-        "y": -922.0,
-        "theta": -1.5747
+        "object": "Simply",
+        "x": 1200.0,
+        "y": -1600.0,
+        "theta": -1.566
     },
     {
-        "object": "Pepsi-xanh",
-        "x": 1167.0,
-        "y": -1308.0,
-        "theta": -1.5405
+        "object": "Revive-trang",
+        "x": 1200.0,
+        "y": -1600.0,
+        "theta": -1.566
     }
 ]
