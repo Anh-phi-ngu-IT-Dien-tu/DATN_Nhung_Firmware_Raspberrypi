@@ -14,10 +14,14 @@ class Shelf:
         self.condition=False#condition for avoiding repeated data self.file_data
         self.semi_condition=False#condition for avoiding out of stock label
         self.oos_condition=False#condition for avoiding repeated data self.oos_file_data
+        self.debug_file=f"Debug_{self.shelf_name}.json"
+        self.debug_data=[]
         with open(self.file_name,"w") as outfile:
             json.dump(self.file_data,outfile)
         with open(self.oos_file_name,"w") as outfile:
             json.dump(self.oos_file_data,outfile)
+        with open(self.debug_file,"w") as outfile:
+            json.dump(self.debug_file,outfile)
         pass
 
     def shelf_object_comparision(self,id,label):
@@ -78,6 +82,11 @@ class Shelf:
 
                     overlap_object=overlap_area/object_area
 
+                    temp_data={
+                        "over_lap":overlap_area,
+                        "ooverlap/object":overlap_object
+                    }
+                    self.debug_data.append(temp_data)
                     if overlap_object>=threshold:
                         if len(self.oos_file_data)==0:
                             temp={
@@ -147,7 +156,8 @@ class Shelf:
             json.dump(self.file_data,outfile,indent=4)
         with open(self.oos_file_name,"w") as outfile:
             json.dump(self.oos_file_data,outfile,indent=4)
-        
+        with open(self.debug_file,"w") as outfile:
+            json.dump(self.debug_data,outfile,indent=4)
         
     
     
