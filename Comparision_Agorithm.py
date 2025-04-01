@@ -31,20 +31,20 @@ class Shelf:
                 pass
             else:    
                 if len(self.file_data)==0:
-                    temp_dictionary={"object":label
+                    temp_dictionary={'object':label
                                      }
                     self.file_data.append(temp_dictionary)
                     print(f"label {temp_dictionary['object']} not in {self.shelf_name}")
                     return
                         
                 for dictionary in self.file_data:
-                    if dictionary["object"]==label:
+                    if dictionary['object']==label:
                         self.condition=False
                         break
                     else:
                         self.condition=True
                 if self.condition==True:
-                    temp_dictionary={"object":label
+                    temp_dictionary={'object':label
                                      }
                     self.file_data.append(temp_dictionary)
                     print(f"label {temp_dictionary['object']} not in {self.shelf_name}")
@@ -56,7 +56,7 @@ class Shelf:
 
             if soos_label=='semi-oos':
                 for dictionary in self.file_data:
-                    if dictionary["object"]==label:
+                    if dictionary['object']==label:
                         self.semi_condition=False
                         break
                     else:
@@ -90,47 +90,47 @@ class Shelf:
                     if overlap_object>=threshold:
                         if len(self.oos_file_data)==0:
                             temp={
-                                "object":label
+                                'object':label
                             }
                             self.oos_file_data.append(temp)
-                            print(f"object {temp["object"]} is semi out of stock at shelf {self.shelf_name}")
+                            print(f"object {temp['object']} is semi out of stock at shelf {self.shelf_name}")
                             return
 
                         for dictionary in self.oos_file_data:
-                            if dictionary["object"]==label:
+                            if dictionary['object']==label:
                                 self.oos_condition=False
                                 break
                             else:
                                 self.oos_condition=True
                         if self.oos_condition==True:
                             temp={
-                                "object":label
+                                'object':label
                             }
                             self.oos_file_data.append(temp)
-                            print(f"object {temp["object"]} is semi out of stock at shelf {self.shelf_name}")
+                            print(f"object {temp['object']} is semi out of stock at shelf {self.shelf_name}")
 
                     else:
                         if len(self.oos_file_data)==0:
                             temp={
-                                "object":"emty semi out of stock"
+                                'object':"emty semi out of stock"
                             }
                             self.oos_file_data.append(temp)
-                            print(f"object {temp["object"]} is semi out of stock at shelf {self.shelf_name}")
+                            print(f"object {temp['object']} is semi out of stock at shelf {self.shelf_name}")
                             return
                         
 
                         for dictionary in self.oos_file_data:
-                            if dictionary["object"]=="emty semi out of stock":
+                            if dictionary['object']=="emty semi out of stock":
                                 self.oos_condition=False
                                 break
                             else:
                                 self.oos_condition=True
                         if self.oos_condition==True:
                             temp={
-                                "object":"emty semi out of stock"
+                                'object':"emty semi out of stock"
                             }
                             self.oos_file_data.append(temp)
-                            print(f"object {temp["object"]} is semi out of stock at shelf {self.shelf_name}")
+                            print(f"object {temp['object']} is semi out of stock at shelf {self.shelf_name}")
 
                         pass
                 pass
