@@ -11,26 +11,26 @@ class Shelf:
         self.oos_file_name=f"Semi_out_of_stock_report_in_{self.shelf_name}.json"
         self.file_data=[]#contains wrong object in shelf
         self.oos_file_data=[]#contain object that semi out of stock
-        self.condition=False
-        self.semi_condition=False
+        self.condition=False#condition for avoiding repeated data self.file_data
+        self.semi_condition=False#condition for avoiding out of stock label
+        self.oos_condition=False#condition for avoiding repeated data self.oos_file_data
         with open(self.file_name,"w") as outfile:
             json.dump(self.file_data,outfile)
         with open(self.oos_file_name,"w") as outfile:
             json.dump(self.oos_file_data,outfile)
         pass
 
-    def shelf_object_comparision(self,id,label,x,y,theta):
+    def shelf_object_comparision(self,id,label):
         if id==self.shelf_id:
             if label in self.shelf:
-                print(f"label {label} in shelf {self.shelf_name}")
+                # print(f"label {label} in shelf {self.shelf_name}")
                 pass
             else:    
-                if self.file_data==[]:
-                    temp_dictionary={"object":label,
-                                "x":x,
-                                "y":y,
-                                "theta":theta}
+                if len(self.file_data)==0:
+                    temp_dictionary={"object":label
+                                     }
                     self.file_data.append(temp_dictionary)
+                    print(f"label {temp_dictionary['object']} not in {self.shelf_name}")
                     return
                         
                 for dictionary in self.file_data:
@@ -40,15 +40,14 @@ class Shelf:
                     else:
                         self.condition=True
                 if self.condition==True:
-                    temp_dictionary={"object":label,
-                                "x":x,
-                                "y":y,
-                                "theta":theta}
+                    temp_dictionary={"object":label
+                                     }
                     self.file_data.append(temp_dictionary)
+                    print(f"label {temp_dictionary['object']} not in {self.shelf_name}")
         else:
             pass
     #x1,y1,x2,y2
-    def semi_out_of_stock_object(self,id,label,object_coordinate,soos_label,soos_coordinate,x,y,theta,threshold=0.5):
+    def semi_out_of_stock_object(self,id,label,object_coordinate,soos_label,soos_coordinate,threshold=0.5):
         if id==self.shelf_id:
 
             if soos_label=='semi-oos':
@@ -80,19 +79,67 @@ class Shelf:
                     overlap_object=overlap_area/object_area
 
                     if overlap_object>=threshold:
-                        temp={
-                            "object":label,
-                            "x":x,
-                            "y":y,
-                            "theta":theta
-                        }
-                        self.oos_file_data.append(temp)
+                        if len(self.oos_file_data)==0:
+                            temp={
+                                "object":label
+                            }
+                            self.oos_file_data.append(temp)
+                            print(f"object {temp["object"]} is semi out of stock at shelf {self.shelf_name}")
+                            return
 
+                        for dictionary in self.oos_file_data:
+                            if dictionary["object"]==label:
+                                self.oos_condition=False
+                                break
+                            else:
+                                self.oos_condition=True
+                        if self.oos_condition==True:
+                            temp={
+                                "object":label
+                            }
+                            self.oos_file_data.append(temp)
+                            print(f"object {temp["object"]} is semi out of stock at shelf {self.shelf_name}")
+
+                    else:
+                        if len(self.oos_file_data)==0:
+                            temp={
+                                "object":"emty semi out of stock"
+                            }
+                            self.oos_file_data.append(temp)
+                            print(f"object {temp["object"]} is semi out of stock at shelf {self.shelf_name}")
+                            return
+                        
+
+                        for dictionary in self.oos_file_data:
+                            if dictionary["object"]=="emty semi out of stock":
+                                self.oos_condition=False
+                                break
+                            else:
+                                self.oos_condition=True
+                        if self.oos_condition==True:
+                            temp={
+                                "object":"emty semi out of stock"
+                            }
+                            self.oos_file_data.append(temp)
+                            print(f"object {temp["object"]} is semi out of stock at shelf {self.shelf_name}")
+
+                        pass
                 pass
 
             pass
         
         else:
+            pass
+
+
+    def out_of_stock_object(self,id,label,object_coordinate,soos_label,soos_coordinate,threshold=2):
+        if id==self.shelf_id:
+
+            if soos_label=='oos':    
+                print(f"{self.shelf_name} has been out of stock")
+
+            pass
+        else :
             pass
 
     def write_data_to_json(self):

@@ -47,10 +47,10 @@ def Cam1():
             if allow_model==1 or allow_model ==2:
                 below_cam.ESP32_Vision_Model()
                 for dictionary in below_cam.label1_dict:
-                    Shelf1_1.shelf_object_comparision(allow_model,dictionary["object"],Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta)
+                    Shelf1_1.shelf_object_comparision(allow_model,dictionary["object"])
                     for soos_dictionary in below_cam.label2_dict:
-                        Shelf1_1.semi_out_of_stock_object(allow_model,dictionary["object"],dictionary["coordinate"],soos_dictionary["stock stage"],soos_dictionary["coordinate"],Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta,0.7)
-                
+                        Shelf1_1.semi_out_of_stock_object(allow_model,dictionary["object"],dictionary["coordinate"],soos_dictionary["stock stage"],soos_dictionary["coordinate"],0.7)
+                        Shelf1_1.out_of_stock_object(allow_model,dictionary["object"],dictionary["coordinate"],soos_dictionary["stock stage"],soos_dictionary["coordinate"],0.7)
 
             print_out=f"{Robot_Pos.message} Shelf {allow_model}"
             below_cam.show_result(print_out)
@@ -74,10 +74,11 @@ def Cam2():
             if allow_model==1 or allow_model ==2:
                 above_cam.ESP32_Vision_Model()
                 for dictionary in above_cam.label1_dict:
-                    Shelf1_2.shelf_object_comparision(allow_model,dictionary["object"],Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta)
+                    Shelf1_2.shelf_object_comparision(allow_model,dictionary["object"])
                     for soos_dictionary in above_cam.label2_dict:
-                        Shelf1_2.semi_out_of_stock_object(allow_model,dictionary["object"],dictionary["coordinate"],soos_dictionary["stock stage"],soos_dictionary["coordinate"],Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta,0.7)
-
+                        Shelf1_2.semi_out_of_stock_object(allow_model,dictionary["object"],dictionary["coordinate"],soos_dictionary["stock stage"],soos_dictionary["coordinate"],0.7)
+                        Shelf1_2.out_of_stock_object(allow_model,dictionary["object"],dictionary["coordinate"],soos_dictionary["stock stage"],soos_dictionary["coordinate"],0.7)
+           
             print_out=f"{Robot_Pos.message} Shelf {allow_model}"
             above_cam.show_result(print_out)
             if cv2.waitKey(1)==ord('q') or break_thread==True:
@@ -88,15 +89,15 @@ def Cam2():
                 
 
 t1=threading.Thread(target=Cam1,daemon=True)
-t2=threading.Thread(target=Cam2,daemon=True)
+# t2=threading.Thread(target=Cam2,daemon=True)
 
 
 t1.start()
-t2.start()
+# t2.start()
 
 
 t1.join()
-t2.join()
+# t2.join()
 
 
 
