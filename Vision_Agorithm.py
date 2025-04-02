@@ -90,6 +90,7 @@ class Vision:
         self.outframe= cv2.resize(self.frame, (800,600))
         self.outframe2= cv2.resize(self.frame2, (800,600))
         cv2.putText(self.outframe,message,(50,50),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),1)
+        cv2.putText(self.outframe2,message,(50,50),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),1)
         cv2.imshow(self.detection_window,self.outframe)
         cv2.imshow(self.oos_window, self.outframe2)
         pass
@@ -204,6 +205,7 @@ class Vision_ESP32:
         self.out_img= cv2.resize(self.img, (800,600))
         self.out_img2= cv2.resize(self.img2, (800,600))
         cv2.putText(self.out_img,message,(50,50),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),1)
+        cv2.putText(self.out_img2,message,(50,50),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),1)
         cv2.imshow(self.detection_window,self.out_img)
         cv2.imshow(self.oos_window, self.out_img2)
         pass

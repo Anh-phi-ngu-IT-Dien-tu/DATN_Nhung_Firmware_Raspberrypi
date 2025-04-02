@@ -3,8 +3,17 @@ import json
 
 
 class Shelf:
-    def __init__(self,shelf={"object1","object2","object3"},shelf_id=1,shelf_name="shelf1_1"):
-        self.shelf=shelf
+    def __init__(self,shelf=["object1","object2","object3"],shelf_id=1,shelf_name="shelf1_1"):
+        self.shelf=[]
+        i=0
+        for object in shelf:
+           i+=1
+           temp={
+               "object":object,
+               "order":i
+           }
+           self.shelf.append(temp)
+
         self.shelf_name=shelf_name
         self.shelf_id=shelf_id
         self.file_name=f"Wrong_object_in_{self.shelf_name}.json"
@@ -14,35 +23,41 @@ class Shelf:
         self.condition=False#condition for avoiding repeated data self.file_data
         self.semi_condition=False#condition for avoiding out of stock label
         self.oos_condition=False#condition for avoiding repeated data self.oos_file_data
+        self.debug_file=f"Debug_{self.shelf_name}.json"
+        self.debug_data=[]
         with open(self.file_name,"w") as outfile:
             json.dump(self.file_data,outfile)
         with open(self.oos_file_name,"w") as outfile:
             json.dump(self.oos_file_data,outfile)
+        with open(self.debug_file,"w") as outfile:
+            json.dump(self.debug_file,outfile)
 
     def shelf_object_comparision(self,id,label):
         if id==self.shelf_id:
-            if label in self.shelf:
-                # print(f"label {label} in shelf {self.shelf_name}")
-                pass
-            else:    
-                if len(self.file_data)==0:
-                    temp_dictionary={'object':label
-                                     }
-                    self.file_data.append(temp_dictionary)
-                    print(f"label {temp_dictionary['object']} not in {self.shelf_name}")
-                    return
-                        
-                for dictionary in self.file_data:
-                    if dictionary['object']==label:
-                        self.condition=False
-                        break
-                    else:
-                        self.condition=True
-                if self.condition==True:
-                    temp_dictionary={'object':label
-                                     }
-                    self.file_data.append(temp_dictionary)
-                    print(f"label {temp_dictionary['object']} not in {self.shelf_name}")
+
+            for dictionary in self.shelf:
+                if label ==dictionary['object']:
+                    # print(f"label {label} in shelf {self.shelf_name}")
+                    pass
+                else:    
+                    if len(self.file_data)==0:
+                        temp_dictionary={'object':label
+                                        }
+                        self.file_data.append(temp_dictionary)
+                        print(f"label {temp_dictionary['object']} not in {self.shelf_name}")
+                        return
+                            
+                    for dictionary in self.file_data:
+                        if dictionary['object']==label:
+                            self.condition=False
+                            break
+                        else:
+                            self.condition=True
+                    if self.condition==True:
+                        temp_dictionary={'object':label
+                                        }
+                        self.file_data.append(temp_dictionary)
+                        print(f"label {temp_dictionary['object']} not in {self.shelf_name}")
         else:
             pass
     #x1,y1,x2,y2
@@ -56,7 +71,7 @@ class Shelf:
                         break
                     else:
                         self.semi_condition=True
-                        continue
+                        
                 
                 if self.semi_condition==True:
                     
@@ -152,6 +167,8 @@ class Shelf:
             json.dump(self.file_data,outfile,indent=4)
         with open(self.oos_file_name,"w") as outfile:
             json.dump(self.oos_file_data,outfile,indent=4)
+        with open(self.debug_file,"w") as outfile:
+            json.dump(self.debug_data,outfile,indent=4)
     
 
 class Shelf_Position:

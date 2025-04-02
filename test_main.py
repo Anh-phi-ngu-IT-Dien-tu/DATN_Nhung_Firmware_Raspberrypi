@@ -5,8 +5,8 @@ from Comparision_Agorithm import *
 from robot_mqtt import Robot_MQTT_Position 
 
 
-Shelf1_1=Shelf({'247', 'Chinsu', 'ChocoPie', 'D.Thanh', 'Heineken', 'Oreo'},1,"shelf1_1")
-Shelf1_2=Shelf({'Pepsi-den', 'Pepsi-xanh', 'Redbull', 'Revive-chanh', 'Revive-trang', 'Simply', 'Tea Plus'},1,"shelf1_2")
+Shelf1_1=Shelf(['247', 'Chinsu', 'ChocoPie', 'D.Thanh', 'Heineken', 'Oreo'],1,"shelf1_1")
+Shelf1_2=Shelf(['Pepsi-den', 'Pepsi-xanh', 'Redbull', 'Revive-chanh', 'Revive-trang', 'Simply', 'Tea Plus'],1,"shelf1_2")
 
 Shelf1_pos=Shelf_Position(1000,1300,-1700,-500,-1.7,-1.3)
 Shelf2_pos=Shelf_Position(-800,-500,-600,-100,1.4,1.8)
@@ -104,4 +104,5 @@ cv2.destroyAllWindows()
 Robot_Pos.stop_mqtt()
 print(Shelf1_1.oos_file_data)
 print(Shelf1_2.oos_file_data)
+print(Shelf1_1.shelf)
 
