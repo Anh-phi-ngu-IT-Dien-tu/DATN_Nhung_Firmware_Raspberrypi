@@ -14,15 +14,10 @@ class Shelf:
         self.condition=False#condition for avoiding repeated data self.file_data
         self.semi_condition=False#condition for avoiding out of stock label
         self.oos_condition=False#condition for avoiding repeated data self.oos_file_data
-        self.debug_file=f"Debug_{self.shelf_name}.json"
-        self.debug_data=[]
         with open(self.file_name,"w") as outfile:
             json.dump(self.file_data,outfile)
         with open(self.oos_file_name,"w") as outfile:
             json.dump(self.oos_file_data,outfile)
-        with open(self.debug_file,"w") as outfile:
-            json.dump(self.debug_file,outfile)
-        pass
 
     def shelf_object_comparision(self,id,label):
         if id==self.shelf_id:
@@ -61,6 +56,7 @@ class Shelf:
                         break
                     else:
                         self.semi_condition=True
+                        continue
                 
                 if self.semi_condition==True:
                     
@@ -156,10 +152,6 @@ class Shelf:
             json.dump(self.file_data,outfile,indent=4)
         with open(self.oos_file_name,"w") as outfile:
             json.dump(self.oos_file_data,outfile,indent=4)
-        with open(self.debug_file,"w") as outfile:
-            json.dump(self.debug_data,outfile,indent=4)
-        
-    
     
 
 class Shelf_Position:

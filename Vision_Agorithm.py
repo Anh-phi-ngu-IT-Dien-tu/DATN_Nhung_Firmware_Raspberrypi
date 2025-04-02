@@ -67,7 +67,7 @@ class Vision:
                 conf = box.conf[0].item()
                 cls = int(box.cls[0].item())
                 label = f"{self.oos_model.names[cls]}: {conf:.2f}"
-                class_name=f"{self.detection_model.names[cls]}"
+                class_name=f"{self.oos_model.names[cls]}"
                 # Gán màu cho từng lớp
                 if self.oos_model.names[cls] == 'oos':
                     color = (0, 255, 0)  # Màu xanh cho oos
@@ -182,7 +182,7 @@ class Vision_ESP32:
                 conf = box.conf[0].item()
                 cls = int(box.cls[0].item())
                 label = f"{self.oos_model.names[cls]}: {conf:.2f}"
-                class_name=f"{self.detection_model.names[cls]}"
+                class_name=f"{self.oos_model.names[cls]}"
                 # Gán màu cho từng lớp
                 if self.oos_model.names[cls] == 'oos':
                     color = (0, 255, 0)  # Màu xanh cho oos
