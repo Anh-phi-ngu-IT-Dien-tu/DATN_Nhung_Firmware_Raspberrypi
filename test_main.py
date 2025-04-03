@@ -5,8 +5,8 @@ from Comparision_Agorithm import *
 from robot_mqtt import Robot_MQTT_Position 
 
 
-Shelf1_1=Shelf(['247', 'Chinsu', 'ChocoPie', 'D.Thanh', 'Heineken', 'Oreo'],1,"shelf1_1")
-Shelf1_2=Shelf(['Pepsi-den', 'Pepsi-xanh', 'Redbull', 'Revive-chanh', 'Revive-trang', 'Simply', 'Tea Plus'],1,"shelf1_2")
+Shelf1_1=Shelf_ver2(['247', 'Chinsu', 'ChocoPie', 'D.Thanh', 'Heineken', 'Oreo'],1,"shelf1_1")
+Shelf1_2=Shelf_ver2(['Pepsi-den', 'Pepsi-xanh', 'Redbull', 'Simply', 'Tea Plus'],1,"shelf1_2")
 
 Shelf1_pos=Shelf_Position(1000,1300,-1700,-500,-1.7,-1.3)
 Shelf2_pos=Shelf_Position(-800,-500,-600,-100,1.4,1.8)
@@ -15,8 +15,8 @@ allow_cam1=0
 allow_cam2=0
 break_threading=0
 
-above_cam=Vision(0,"stockv14.pt","oosv8_20.3.pt",0.6,0.45,"Above_detection","Above_Out_of_stock")
-below_cam=Vision(1,"stockv14.pt","oosv8_20.3.pt",0.6,0.45,"Below_detection","Below_Out_of_stock")
+above_cam=Vision(0,"stockv17.pt","oosv8_20.3.pt",0.6,0.45,"Above_detection","Above_Out_of_stock")
+below_cam=Vision(2,"stockv17.pt","oosv8_20.3.pt",0.6,0.45,"Below_detection","Below_Out_of_stock")
 
 Robot_Pos=Robot_MQTT_Position(host="broker.emqx.io")
 Robot_Pos.start_mqtt()
@@ -45,10 +45,7 @@ def Cam1():
             Shelf_Pos_Compare()
             if allow_model==1 or allow_model ==2:
                 below_cam.Vision_Model()
-                for dictionary in below_cam.label1_dict:
-                    Shelf1_1.shelf_object_comparision(allow_model,dictionary['object'])
-                    for soos_dictionary in below_cam.label2_dict:
-                        Shelf1_1.semi_out_of_stock_object(allow_model,dictionary['object'],dictionary['coordinate'],soos_dictionary['stock stage'],soos_dictionary['coordinate'],0.7)
+                Shelf1_1.shelf_object_comparision(allow_model,below_cam.object_label_dict)
 
             print_out=f"{Robot_Pos.message} Shelf {allow_model}"
             below_cam.show_result(print_out)
@@ -71,10 +68,7 @@ def Cam2():
         if allow_cam2>10:
             if allow_model==1 or allow_model ==2:
                 above_cam.Vision_Model()
-                for dictionary in above_cam.label1_dict:
-                    Shelf1_2.shelf_object_comparision(allow_model,dictionary['object'])
-                    for soos_dictionary in below_cam.label2_dict:
-                        Shelf1_2.semi_out_of_stock_object(allow_model,dictionary['object'],dictionary['coordinate'],soos_dictionary['stock stage'],soos_dictionary['coordinate'],0.7)
+                Shelf1_2.shelf_object_comparision(allow_model,above_cam.object_label_dict)
                    
 
             above_cam.show_result()
@@ -102,7 +96,5 @@ t2.join()
 
 cv2.destroyAllWindows()
 Robot_Pos.stop_mqtt()
-print(Shelf1_1.oos_file_data)
-print(Shelf1_2.oos_file_data)
 print(Shelf1_1.shelf)
 
