@@ -1,14 +1,12 @@
 import cv2
 import numpy as np
 from Vision_Agorithm import Vision_Picture
-from Comparision_Agorithm import Shelf_ver2
+from Comparision_Agorithm import Shelf
 
 
+Shelf1_1=Shelf(['Heineken','TH true Milk'],1,"shelf1_1")
 
-
-Shelf1_1=Shelf_ver2(['Pepsi-den', 'Pepsi-xanh', 'Redbull', 'Simply', 'Tea Plus'],1,"shelf1_1")
-
-Test_pic=Vision_Picture('path.jpg','stockv17.pt','oosv8_20.3pt',0.6,0.5,"Test detection","Test out of stock")
+Test_pic=Vision_Picture("C:/Users/GIGABYTE/Desktop/DATN_Vision/DATN/images1/phai/Im_R_29.png",'stockv18.pt','oosv11.pt',0.7,0.6,"Test1","Test2")
 
 Test_pic.Capture_frame()
 Test_pic.Vision_Model()
@@ -24,4 +22,4 @@ cv2.destroyAllWindows()
 cv2.imwrite(Test_pic.detection_window,Test_pic.outframe)
 cv2.imwrite(Test_pic.oos_window,Test_pic.outframe2)
 
-Shelf1_1.write_data_to_json
+Shelf1_1.write_data_to_json()

@@ -6,8 +6,8 @@ from robot_mqtt import Robot_MQTT_Position
 
 
 
-Shelf1_1=Shelf({'247', 'Chinsu', 'ChocoPie', 'D.Thanh', 'Heineken', 'Oreo'},1,"shelf1_1")
-Shelf1_2=Shelf({'Pepsi-den', 'Pepsi-xanh', 'Redbull', 'Revive-chanh', 'Revive-trang', 'Simply', 'Tea Plus'},1,"shelf1_2")
+Shelf1_1=Shelf(['247', 'Chinsu', 'ChocoPie', 'D.Thanh', 'Heineken', 'Oreo'],1,"shelf1_1")
+Shelf1_2=Shelf(['Pepsi-den', 'Pepsi-xanh', 'Redbull', 'Revive-chanh', 'Revive-trang', 'Simply', 'Tea Plus'],1,"shelf1_2")
 
 Shelf1_pos=Shelf_Position(1000,1300,-1700,-500,-1.7,-1.3)
 Shelf2_pos=Shelf_Position(-800,-500,-1000,-150,1.4,1.8)
@@ -46,15 +46,12 @@ def Cam1():
             Shelf_Pos_Compare()
             if allow_model==1 or allow_model ==2:
                 below_cam.ESP32_Vision_Model()
-                for dictionary in below_cam.label1_dict:
-                    Shelf1_1.shelf_object_comparision(allow_model,dictionary["object"])
-                    for soos_dictionary in below_cam.label2_dict:
-                        Shelf1_1.semi_out_of_stock_object(allow_model,dictionary["object"],dictionary["coordinate"],soos_dictionary["stock stage"],soos_dictionary["coordinate"],0.7)
-                        Shelf1_1.out_of_stock_object(allow_model,dictionary["object"],dictionary["coordinate"],soos_dictionary["stock stage"],soos_dictionary["coordinate"],0.7)
+                Shelf1_1.shelf_object_comparision(allow_model,below_cam.object_label_dict)
+                Shelf1_1.semi_out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict,0.7)
 
             print_out=f"{Robot_Pos.message} Shelf {allow_model}"
             below_cam.show_result(print_out)
-            if cv2.waitKey(1)==ord('q'):
+            if cv2.waitKey(1)==ord('q') or break_thread==True:
                 Shelf1_1.write_data_to_json()
                 break_thread=True
                 break
@@ -73,16 +70,14 @@ def Cam2():
         if allow_cam2>10:
             if allow_model==1 or allow_model ==2:
                 above_cam.ESP32_Vision_Model()
-                for dictionary in above_cam.label1_dict:
-                    Shelf1_2.shelf_object_comparision(allow_model,dictionary["object"])
-                    for soos_dictionary in above_cam.label2_dict:
-                        Shelf1_2.semi_out_of_stock_object(allow_model,dictionary["object"],dictionary["coordinate"],soos_dictionary["stock stage"],soos_dictionary["coordinate"],0.7)
-                        Shelf1_2.out_of_stock_object(allow_model,dictionary["object"],dictionary["coordinate"],soos_dictionary["stock stage"],soos_dictionary["coordinate"],0.7)
+                Shelf1_2.shelf_object_comparision(allow_model,above_cam.object_label_dict)
+                Shelf1_2.semi_out_of_stock_checking(allow_model,above_cam.object_label_dict,above_cam.stock_stage_label_dict,0.7)                
            
             print_out=f"{Robot_Pos.message} Shelf {allow_model}"
             above_cam.show_result(print_out)
             if cv2.waitKey(1)==ord('q') or break_thread==True:
                 Shelf1_2.write_data_to_json()
+                break_thread=True
                 break
             continue
         allow_cam2+=1    
