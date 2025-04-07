@@ -186,12 +186,12 @@ class Shelf:
                     else:
                         i=1
                         for label in self.shelf:
-                            if i>self.shelf[closest_left_product[0][0]] and i<self.shelf[closest_left_product[0][0]] :
+                            if i>self.shelf[closest_left_product[0][0]] and i<self.shelf[closest_right_product[0][0]] :
                                 for label_set in self.shelf_set:
                                     if self.shelf[label_set]==i:
                                         self.oos_data[label_set]=1
                                         break
-                            i=i+1        
+                                    
                 
                 elif len(closest_left_product) > 0:
                     self.oos_data[closest_left_product[0][0]]=max(0.5,self.oos_data[closest_left_product[0][0]])
