@@ -112,7 +112,7 @@ class Shelf:
             pass
 
 
-    def out_of_stock_checking(self,id=1,object_dictionary_list=[{"object":'247',"coordinate":np.array([0,0,0,0])}],stock_stage_dictionary_list=[{"stock stage":'semi-oos',"coordinate":np.array([0,0,0,0])}],threshold=0.5):
+    def out_of_stock_checking(self,id=1,object_dictionary_list=[{"object":'247',"coordinate":np.array([0,0,0,0])}],stock_stage_dictionary_list=[{"stock stage":'semi-oos',"coordinate":np.array([0,0,0,0])}]):
         if id==self.shelf_id:
             out_stock=[]
             if len(stock_stage_dictionary_list)==0:
@@ -129,6 +129,11 @@ class Shelf:
                 x_center_oos=(x1+x2)/2
                 y_center_oos=(y1+y2)/2
 
+
+
+                left_product=[]
+                right_product=[]
+
                 for object in object_dictionary_list:
                     if object['object'] not in self.shelf_set:
                         continue
@@ -137,6 +142,61 @@ class Shelf:
                     x1o,y1o,x2o,y2o=object['coordinate']
                     x_center_ob=(x1o+x2o)/2
                     y_center_ob=(y1o+y2o)/2
+
+
+                    distance=np.sqrt((x_center_ob-x_center_oos)**2+(y_center_ob-y_center_oos)**2)
+
+                    if x_center_ob<x_center_oos:
+                        left_product.append([object['object'],x_center_ob,y_center_ob,distance])
+                    if x_center_ob>x_center_oos:
+                        right_product.append([object['object'],y_center_ob,y_center_oos,distance])
+
+                closest_left_product=[]
+                closest_right_product=[]
+
+                if len(left_product)>0:
+                    temp=[]
+                    for product in left_product:
+                        temp.append(product[3])
+                    min_temp=min(temp)
+                    min_index=temp.index(min_temp)    
+                    closest_left_product.append(left_product[min_index])
+
+                if len(right_product)>0:
+                    temp=[]
+                    for product in right_product:
+                        temp.append(product[3])
+                    min_temp=min(temp)
+                    min_index=temp.index(min_temp)    
+                    closest_left_product.append(right_product[min_index])
+
+                if len(closest_left_product) == 0 and len(closest_right_product) == 0:
+                    self.oos_data[""]=1
+                
+                elif len(closest_left_product) > 0 and len(closest_right_product) > 0:
+                    if closest_left_product[0][0]==closest_right_product[0][0]:
+                        self.oos_data[closest_left_product[0][0]]=1
+
+                    else:
+                        self.oos_data[closest_left_product[0][0]]=max(0.5,self.oos_data[closest_left_product[0][0]])
+                        self.oos_data[closest_right_product[0][0]]=max(0.5,self.oos_data[closest_right_product[0][0]])
+
+                    if self.shelf[closest_left_product[0][0]]== (self.shelf[closest_right_product[0][0]]-1):
+                        continue
+                    else:
+                        i=1
+                        for label in self.shelf:
+                            if i>self.shelf[closest_left_product[0][0]] and i<self.shelf[closest_left_product[0][0]] :
+                                for label_set in self.shelf_set:
+                                    if self.shelf[label_set]==i:
+                                        self.oos_data[label_set]=1
+                                        break
+                            i=i+1        
+                
+                elif len(closest_left_product) > 0:
+                    self.oos_data[closest_left_product[0][0]]=max(0.5,self.oos_data[closest_left_product[0][0]])
+                elif len(closest_right_product) >0:
+                    self.oos_data[closest_right_product[0][0]]=max(0.5,self.oos_data[closest_right_product[0][0]])
 
             
         else:
@@ -147,6 +207,8 @@ class Shelf:
             json.dump(self.wrong_object_data,outfile,indent=4)
         with open(self.soos_file_name,"w") as outfile:
             json.dump(self.soos_data,outfile,indent=4)
+        with open(self.oos_file_name,"w") as outfile:
+            json.dump(self.oos_data,outfile,indent=4)
 
 
 class Shelf_Position:

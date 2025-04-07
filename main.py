@@ -12,6 +12,7 @@ Shelf1_2=Shelf(['Pepsi-den', 'Pepsi-xanh', 'Redbull', 'Revive-chanh', 'Revive-tr
 Shelf1_pos=Shelf_Position(1000,1300,-1700,-500,-1.7,-1.3)
 Shelf2_pos=Shelf_Position(-800,-500,-1000,-150,1.4,1.8)
 allow_model=0
+allow_model2=0
 allow_cam1=0
 allow_cam2=0
 break_thread=False
@@ -35,6 +36,16 @@ def Shelf_Pos_Compare():
     else:
         allow_model=0
 
+def Shelf_Pos_Compare2():
+    global allow_model2
+    Shelf1_pos.compare_robot_shelf_position(Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta)
+    Shelf2_pos.compare_robot_shelf_position(Robot_Pos.x,Robot_Pos.y,Robot_Pos.theta)
+    if Shelf1_pos.comparision_result==True and Shelf2_pos.comparision_result ==False:
+        allow_model2=1
+    elif Shelf1_pos.comparision_result==False and Shelf2_pos.comparision_result ==True:
+        allow_model2=2
+    else:
+        allow_model2=0
 
 def Cam1():
     global allow_model
@@ -62,18 +73,19 @@ def Cam1():
    
 
 def Cam2():
-    global allow_model
+    global allow_model2
     global allow_cam2
     global break_thread
     while True:
         above_cam.Capture_frame()
         if allow_cam2>10:
-            if allow_model==1 or allow_model ==2:
+            Shelf_Pos_Compare2()
+            if allow_model2==1 or allow_model2 ==2:
                 above_cam.ESP32_Vision_Model()
-                Shelf1_2.shelf_object_comparision(allow_model,above_cam.object_label_dict)
-                Shelf1_2.semi_out_of_stock_checking(allow_model,above_cam.object_label_dict,above_cam.stock_stage_label_dict,0.7)                
+                Shelf1_2.shelf_object_comparision(allow_model2,above_cam.object_label_dict)
+                Shelf1_2.semi_out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict,0.7)                
            
-            print_out=f"{Robot_Pos.message} Shelf {allow_model}"
+            print_out=f"{Robot_Pos.message} Shelf {allow_model2}"
             above_cam.show_result(print_out)
             if cv2.waitKey(1)==ord('q') or break_thread==True:
                 Shelf1_2.write_data_to_json()
