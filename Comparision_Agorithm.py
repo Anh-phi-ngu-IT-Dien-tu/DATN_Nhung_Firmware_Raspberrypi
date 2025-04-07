@@ -15,6 +15,7 @@ class Shelf:
            }
            self.shelf.update(temp)
         self.shelf.pop("")
+        self.max_order =i
         self.shelf_name=shelf_name
         self.shelf_id=shelf_id
         self.wrong_object_file_name=f"Wrong_object_in_{self.shelf_name}.json"
@@ -168,7 +169,7 @@ class Shelf:
                         temp.append(product[3])
                     min_temp=min(temp)
                     min_index=temp.index(min_temp)    
-                    closest_left_product.append(right_product[min_index])
+                    closest_right_product.append(right_product[min_index])
 
                 if len(closest_left_product) == 0 and len(closest_right_product) == 0:
                     self.oos_data[""]=1
@@ -184,15 +185,13 @@ class Shelf:
                     if self.shelf[closest_left_product[0][0]]== (self.shelf[closest_right_product[0][0]]-1):
                         continue
                     else:
-                        i=1
-                        for label in self.shelf:
+                        
+                        for i in range(1,self.max_order+1):
                             if i>self.shelf[closest_left_product[0][0]] and i<self.shelf[closest_right_product[0][0]] :
                                 for label_set in self.shelf_set:
                                     if self.shelf[label_set]==i:
                                         self.oos_data[label_set]=1
-                                        break
-                                    
-                
+                    
                 elif len(closest_left_product) > 0:
                     self.oos_data[closest_left_product[0][0]]=max(0.5,self.oos_data[closest_left_product[0][0]])
                 elif len(closest_right_product) >0:
