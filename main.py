@@ -6,19 +6,19 @@ from robot_mqtt import Robot_MQTT_Position
 
 
 
-Shelf1_1=Shelf(['247', 'Chinsu', 'ChocoPie', 'D.Thanh', 'Heineken', 'Oreo'],1,"shelf1_1")
-Shelf1_2=Shelf(['Pepsi-den', 'Pepsi-xanh', 'Redbull', 'Revive-chanh', 'Revive-trang', 'Simply', 'Tea Plus'],1,"shelf1_2")
+Shelf1_1=Shelf(['custas', 'ChocoPie'],1,"shelf1_1")
+Shelf1_2=Shelf(['coca', 'Pepsi-xanh', 'Vinamilk'],1,"shelf1_2")
 
 Shelf1_pos=Shelf_Position(1000,1300,-1700,-500,-1.7,-1.3)
 Shelf2_pos=Shelf_Position(-800,-500,-1000,-150,1.4,1.8)
-allow_model=0
-allow_model2=0
+allow_model=2
+allow_model2=2
 allow_cam1=0
 allow_cam2=0
 break_thread=False
 
-above_cam=Vision_ESP32("http://192.168.137.21/capture","stockv17.pt","oosv8_20.3.pt",0.6,0.45,"Above_detection","Above_Out_of_stock")
-below_cam=Vision_ESP32("http://192.168.137.190/capture","stockv17.pt","oosv8_20.3.pt",0.6,0.45,"Below_detection","Below_Out_of_stock")
+above_cam=Vision_ESP32("http://192.168.137.245/capture","stockv18.pt","oosv11.pt",0.75,0.6,"Above_detection","Above_Out_of_stock")
+below_cam=Vision_ESP32("http://192.168.137.148/capture","stockv18.pt","oosv11.pt",0.75,0.6,"Below_detection","Below_Out_of_stock")
 
 Robot_Pos=Robot_MQTT_Position(host="broker.emqx.io")
 Robot_Pos.start_mqtt()
@@ -54,11 +54,12 @@ def Cam1():
     while True:
         below_cam.Capture_frame()
         if allow_cam1>10:
-            Shelf_Pos_Compare()
+            # Shelf_Pos_Compare()
             if allow_model==1 or allow_model ==2:
                 below_cam.ESP32_Vision_Model()
                 Shelf1_1.shelf_object_comparision(allow_model,below_cam.object_label_dict)
                 Shelf1_1.semi_out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict,0.7)
+                Shelf1_1.out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict)
 
             print_out=f"{Robot_Pos.message} Shelf {allow_model}"
             below_cam.show_result(print_out)
@@ -79,11 +80,12 @@ def Cam2():
     while True:
         above_cam.Capture_frame()
         if allow_cam2>10:
-            Shelf_Pos_Compare2()
+            # Shelf_Pos_Compare2()
             if allow_model2==1 or allow_model2 ==2:
                 above_cam.ESP32_Vision_Model()
                 Shelf1_2.shelf_object_comparision(allow_model2,above_cam.object_label_dict)
-                Shelf1_2.semi_out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict,0.7)                
+                Shelf1_2.semi_out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict,0.7) 
+                Shelf1_2.out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict)               
            
             print_out=f"{Robot_Pos.message} Shelf {allow_model2}"
             above_cam.show_result(print_out)
@@ -109,5 +111,7 @@ t2.join()
 
 
 cv2.destroyAllWindows()
+Shelf1_1.write_data_to_json()
+Shelf1_2.write_data_to_json()
 Robot_Pos.stop_mqtt()
 

@@ -252,7 +252,7 @@ class Vision_ESP32:
                 # Draw bounding boxes and labels on the camera frame
                 color=self.color[cls]
                 cv2.rectangle(self.img, (x1, y1), (x2, y2), color, 2)
-                cv2.putText(self.img, label, (x1, y1 - 50), cv2.FONT_HERSHEY_SIMPLEX, 1.5,color, 2)
+                cv2.putText(self.img, label, (x1, y1 + 50), cv2.FONT_HERSHEY_SIMPLEX, 1.5,color, 2)
                 temp_dict={
                     "object":class_name,
                     "coordinate":np.array([x1,y1,x2,y2])
@@ -279,7 +279,7 @@ class Vision_ESP32:
 
                 # Vẽ bounding box và label với màu tương ứng
                 cv2.rectangle(self.img2, (x1, y1), (x2, y2), color, 2)
-                cv2.putText(self.img2, label, (x1, y1 - 50), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 1)
+                cv2.putText(self.img2, label, (x1, y1 + 50), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 1)
                 temp_dict={
                     "stock stage":class_name,
                     "coordinate":np.array([x1,y1,x2,y2])
