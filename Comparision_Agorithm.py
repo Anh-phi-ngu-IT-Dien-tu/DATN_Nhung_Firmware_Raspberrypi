@@ -193,9 +193,15 @@ class Shelf:
                                         self.oos_data[label_set]=1
                     
                 elif len(closest_left_product) > 0:
-                    self.oos_data[closest_left_product[0][0]]=max(0.5,self.oos_data[closest_left_product[0][0]])
+                    if self.shelf[closest_left_product[0][0]]==self.max_order:
+                        self.oos_data[closest_left_product[0][0]]=1
+                    else:
+                        self.oos_data[closest_left_product[0][0]]=max(0.5,self.oos_data[closest_left_product[0][0]])
                 elif len(closest_right_product) >0:
-                    self.oos_data[closest_right_product[0][0]]=max(0.5,self.oos_data[closest_right_product[0][0]])
+                    if self.shelf[closest_right_product[0][0]]==1:
+                        self.oos_data[closest_right_product[0][0]]=1
+                    else:
+                        self.oos_data[closest_right_product[0][0]]=max(0.5,self.oos_data[closest_right_product[0][0]])
 
             
         else:

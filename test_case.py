@@ -6,7 +6,7 @@ from Comparision_Agorithm import Shelf
 
 Shelf1_1=Shelf(['Heineken','custas','coca'],1,"shelf1_1")
 
-Test_pic=Vision_Picture("C:/Users/GIGABYTE/Desktop/DATN_Vision/DATN/images2/phai/Im_R_12.png",'stockv18.pt','oosv11.pt',0.7,0.6,"Test1","Test2")
+Test_pic=Vision_Picture("C:/Users/GIGABYTE/Desktop/DATN_Vision/DATN/images1/phai/Im_R_6.png",'stockv18.pt','oosv11.pt',0.7,0.6,"Test1","Test2")
 
 Test_pic.Capture_frame()
 Test_pic.Vision_Model()
