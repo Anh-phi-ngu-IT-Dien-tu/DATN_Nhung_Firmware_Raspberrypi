@@ -102,6 +102,7 @@ class gui_handling(Ui_MainWindow):
        
     def mqttStopButtonHandle(self):
         self.gui_mqtt.stop_mqtt()
+        self.gui_mqtt.disconnect()
         msg=QMessageBox()
         msg.setWindowTitle("MQTT warning")
         msg.setText("MQTT has been disconnected")

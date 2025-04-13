@@ -53,3 +53,6 @@ class Robot_MQTT_Position:
 
     def stop_mqtt(self):
         self.client.loop_stop()
+
+    def disconnect(self):
+        self.client.disconnect()
