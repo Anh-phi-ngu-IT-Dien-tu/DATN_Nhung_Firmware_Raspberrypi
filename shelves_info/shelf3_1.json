@@ -1,0 +1,15 @@
+{
+    "Shelf": 3,
+    "Sub shelf": 1,
+    "Product": "D.Thanh,ChocoPie,Chinsu",
+    "From": [
+        1500.0,
+        300.0,
+        0.0
+    ],
+    "To": [
+        1400.0,
+        200.0,
+        200.0
+    ]
+}
