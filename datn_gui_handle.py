@@ -14,6 +14,8 @@ class gui_handling(Ui_MainWindow):
         self.main_window=QtWidgets.QMainWindow()
         self.setupUi(self.main_window)
 
+        self.noteTextBrowser.setPlainText("The coordinate of every shelves are defined following sub shelf" \
+        " 1. User should define sub shelf 2 coordinate the same as sub shelf 1")
 
         ### mqtt worker
         self.mqtt_worker = None

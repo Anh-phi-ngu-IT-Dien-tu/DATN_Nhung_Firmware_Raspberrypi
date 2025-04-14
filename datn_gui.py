@@ -241,6 +241,18 @@ class Ui_MainWindow(object):
         self.thetaToDoubleSpinBox.setMinimum(-5000.0)
         self.thetaToDoubleSpinBox.setMaximum(5000.0)
         self.thetaToDoubleSpinBox.setObjectName("thetaToDoubleSpinBox")
+        self.noteGroupBox = QtWidgets.QGroupBox(self.centralwidget)
+        self.noteGroupBox.setGeometry(QtCore.QRect(810, 360, 581, 101))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.noteGroupBox.setFont(font)
+        self.noteGroupBox.setObjectName("noteGroupBox")
+        self.noteTextBrowser = QtWidgets.QTextBrowser(self.noteGroupBox)
+        self.noteTextBrowser.setGeometry(QtCore.QRect(10, 20, 561, 71))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.noteTextBrowser.setFont(font)
+        self.noteTextBrowser.setObjectName("noteTextBrowser")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1400, 26))
@@ -290,6 +302,7 @@ class Ui_MainWindow(object):
         self.label_23.setText(_translate("MainWindow", "y"))
         self.label_24.setText(_translate("MainWindow", "theta"))
         self.label_25.setText(_translate("MainWindow", "To"))
+        self.noteGroupBox.setTitle(_translate("MainWindow", "Note"))
 
 
 if __name__ == "__main__":
