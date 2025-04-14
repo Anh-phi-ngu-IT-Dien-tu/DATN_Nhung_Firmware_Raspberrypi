@@ -1,8 +1,9 @@
 import json
 import numpy as np
+import os
 
 class Shelf:
-    def __init__(self,shelf=["object1","object2","object3"],shelf_id=1,shelf_name="shelf1_1"):
+    def __init__(self,shelf=["object1","object2","object3"],shelf_id=1,shelf_sub_id=1,shelf_name="shelf1_1",shelf_path="./shelf_info_report"):
         self.shelf_set={""}
         self.shelf_set.update(shelf)
         self.shelf_set.remove("")
@@ -18,22 +19,56 @@ class Shelf:
         self.max_order =i
         self.shelf_name=shelf_name
         self.shelf_id=shelf_id
-        self.wrong_object_file_name=f"Wrong_object_in_{self.shelf_name}.json"
-        self.soos_file_name=f"Semi_out_of_stock_report_in_{self.shelf_name}.json"
-        self.oos_file_name=f"Out_of_stock_report_in_{self.shelf_name}.json"
+        self.shelf_sub_id=shelf_sub_id
+        self.shelf_path=shelf_path
+        self.addproductcheck=0
+        self.wrong_object_file_name=f"{self.shelf_path}/Wrong_object_in_{self.shelf_name}.json"
+        self.soos_file_name=f"{self.shelf_path}/Semi_out_of_stock_report_in_{self.shelf_name}.json"
+        self.oos_file_name=f"{self.shelf_path}/Out_of_stock_report_in_{self.shelf_name}.json"
         self.wrong_object_data=[]#contains wrong object in shelf
         self.soos_data=dict.fromkeys(shelf,0)#contain object that semi out of stock
         self.soos_data.update({"":0})
         self.oos_data=dict.fromkeys(shelf,0)
         self.oos_data.update({"":0})
+        self.seen_data=dict.fromkeys(shelf,0)
+        self.pre_state=False# to obtain the state if the robot is in range of shelf 1 or not
+        self.state=False
         self.wrong_object_non_repeated_condition=False#condition for avoiding repeated data self.wrong_object_data
         with open(self.wrong_object_file_name,"w") as outfile:
-            json.dump(self.wrong_object_data,outfile)
+            json.dump(self.wrong_object_data,outfile,indent=4)
         with open(self.soos_file_name,"w") as outfile:
             json.dump(self.soos_data,outfile,indent=4)
         with open(self.oos_file_name,"w") as outfile:
             json.dump(self.oos_data,outfile,indent=4)
         pass
+
+
+    def Load_shelf_information(self,id=1,sub_id=1,shelf=["object1","object2","object3"]):
+        if id==self.shelf_id and sub_id==self.shelf_sub_id:
+            self.shelf_set={""}
+            self.shelf_set.update(shelf)
+            self.shelf_set.remove("")
+            self.shelf={"":0}
+            i=0
+            for object in shelf:
+                i+=1
+                temp={
+                    object:i
+                }
+                self.shelf.update(temp)
+            self.shelf.pop("")
+            self.max_order =i
+            self.soos_data=dict.fromkeys(shelf,0)#contain object that semi out of stock
+            self.soos_data.update({"":0})
+            self.oos_data=dict.fromkeys(shelf,0)
+            self.oos_data.update({"":0})
+            self.seen_data=dict.fromkeys(shelf,0)
+            with open(self.wrong_object_file_name,"w") as outfile:
+                json.dump(self.wrong_object_data,outfile,indent=4)
+            with open(self.soos_file_name,"w") as outfile:
+                json.dump(self.soos_data,outfile,indent=4)
+            with open(self.oos_file_name,"w") as outfile:
+                json.dump(self.oos_data,outfile,indent=4)
 
 
     def shelf_object_comparision(self,id=1,object_dictionary_list=[{"object":'247',"coordinate":np.array([0,0,0,0])}]):
@@ -206,6 +241,24 @@ class Shelf:
             
         else:
             pass
+    
+    def seen_product_checking(self,id,object_dictionary_list=[{"object":'247',"coordinate":np.array([0,0,0,0])}]):
+        if id==self.shelf_id:
+            self.state=True
+            for object in object_dictionary_list:
+                if object['object'] in self.shelf_set:
+                    self.seen_data[object['object']]=1
+
+        else:
+            self.state=False
+        
+        if self.state==False and self.pre_state==True:
+            for object in self.shelf_set:
+                if self.seen_data[object]==0:
+                    self.soos_data[object]=1
+        
+        self.pre_state=self.state
+
 
     def write_data_to_json(self):
         with open(self.wrong_object_file_name,"w") as outfile:
@@ -214,10 +267,13 @@ class Shelf:
             json.dump(self.soos_data,outfile,indent=4)
         with open(self.oos_file_name,"w") as outfile:
             json.dump(self.oos_data,outfile,indent=4)
+        
 
 
 class Shelf_Position:
-    def __init__(self,x_below=0.0,x_above=0.0,y_below=0.0,y_above=0.0,theta_below=0.0,theta_above=0.0):
+    def __init__(self,shelf_id=1,x_below=0.0,x_above=0.0,y_below=0.0,y_above=0.0,theta_below=0.0,theta_above=0.0):
+        self.shelf_id=shelf_id
+        self.already_written=False
         self.x_below=x_below
         self.x_above=x_above
         self.y_below=y_below
@@ -227,9 +283,20 @@ class Shelf_Position:
         self.comparision_result=False
         pass
 
+    def Load_shelf_position(self,id=1,below_coordinate=[0.0,0.0,0.0],above_coordinate=[0.0,0.0,0.0]):
+        if id==self.shelf_id and self.already_written==False :
+            self.x_below=below_coordinate[0]
+            self.x_above=above_coordinate[0]
+            self.y_below=below_coordinate[1]
+            self.y_above=above_coordinate[1]
+            self.theta_below=below_coordinate[2]
+            self.theta_above=above_coordinate[2]
+            self.already_written=True
+
     def compare_robot_shelf_position(self,x,y,theta):
         if self.x_below<=x<=self.x_above and self.y_below<=y<=self.y_above and self.theta_below<=theta<=self.theta_above:
             self.comparision_result=True
         else:
             self.comparision_result=False
         return self.comparision_result
+

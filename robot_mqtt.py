@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 
 class Robot_MQTT_Position:
 
-    def __init__(self,host="test.mosquitto.org",port=1883,topic="Robot"):
+    def __init__(self,host="test.mosquitto.org",port=1883,topic="Robot",use_coordinate=True):
         self.message=None
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
@@ -13,6 +13,7 @@ class Robot_MQTT_Position:
         self.theta=0.0
         self.temp_message=None
         self.topic=topic
+        self.use_coordinate=use_coordinate
         pass
 
     def on_connect(self,client, userdata, flags, rc):
@@ -27,15 +28,20 @@ class Robot_MQTT_Position:
         # Do something else
     
         self.message=str(msg.payload.decode("utf-8"))
-        try:
-            self.temp_message=self.message.split('/')
-            self.x=float(self.temp_message[0])
-            self.y=float(self.temp_message[1])
-            self.theta=float(self.temp_message[2])
-        except:
-            pass
+        if self.use_coordinate==True:
+            try:
+                self.temp_message=self.message.split('/')
+                self.x=float(self.temp_message[0])
+                self.y=float(self.temp_message[1])
+                self.theta=float(self.temp_message[2])
+            except:
+                pass
 
-    
+    def get_message(self):
+        message=self.message
+        self.message=None
+        return message
+
     def publish(self,topic="Robot",message=""):
         self.client.publish(topic, message)
 
