@@ -45,7 +45,7 @@ class Robot_MQTT_Position:
                 pass
 
     
-    def publish(self,topic="Robot",message=""):
+    def publish(self,topic="Robot",message=''):
         self.client.publish(topic, message)
 
     def start_mqtt(self):

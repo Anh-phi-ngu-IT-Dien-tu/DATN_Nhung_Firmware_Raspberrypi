@@ -1,15 +1,20 @@
 {
     "Shelf": 2,
     "Sub shelf": 1,
-    "Product": "D.Thanh,Heineken,Pepsi-xanh",
+    "Product": [
+        "D.Thanh",
+        "Heineken",
+        "Pepsi-xanh",
+        "ChocoPie"
+    ],
     "From": [
+        10.0,
         0.0,
-        0.0,
-        0.0
+        3.14
     ],
     "To": [
-        0.0,
-        0.0,
-        0.0
+        20.0,
+        100.0,
+        10.0
     ]
 }

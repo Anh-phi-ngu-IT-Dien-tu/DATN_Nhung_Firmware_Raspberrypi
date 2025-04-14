@@ -96,7 +96,7 @@ class Ui_MainWindow(object):
         self.shelfIdSpinBox = QtWidgets.QSpinBox(self.ShelfPropertiesGroupBox)
         self.shelfIdSpinBox.setGeometry(QtCore.QRect(90, 200, 71, 22))
         self.shelfIdSpinBox.setMinimum(1)
-        self.shelfIdSpinBox.setMaximum(11)
+        self.shelfIdSpinBox.setMaximum(4)
         self.shelfIdSpinBox.setObjectName("shelfIdSpinBox")
         self.subShelfIdSpinBox = QtWidgets.QSpinBox(self.ShelfPropertiesGroupBox)
         self.subShelfIdSpinBox.setGeometry(QtCore.QRect(340, 200, 71, 22))

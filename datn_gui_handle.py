@@ -118,16 +118,15 @@ class gui_handling(Ui_MainWindow):
     
 
     def mqttSendSettingButtonHandle(self):
-        message=[]
+        message=''
         for root, dirs, files in os.walk(self.path):
             for file in files:
                 if file.endswith(".json"):
                     full_path = os.path.join(root, file)
                     with open(full_path,"r") as readfile:
                         data = json.load(readfile)
-                        message.append(data)
-        
-        message=str(message)
+                        message=message+f'{data}/'
+                        
         self.gui_mqtt.publish(self.gui_mqtt.topic,message)
         msg=QMessageBox()
         msg.setWindowTitle("MQTT warning")
@@ -170,7 +169,8 @@ class gui_handling(Ui_MainWindow):
             self.shelfComboBox.addItem(f"Shelf {shelf}")
         subshelf=self.subShelfIdSpinBox.value()
         file=f"{self.path}/shelf{shelf}_{subshelf}.json"
-        product=self.subShelfProductLineEdit.text()
+        text=self.subShelfProductLineEdit.text()
+        product=text.split(',')
         below=[self.xBelowDoubleSpinBox.value(),self.yBelowDoubleSpinBox.value(),self.thetaBelowDoubleSpinBox.value()]
         above=[self.xAboveDoubleSpinBox.value(),self.yAboveDoubleSpinBox.value(),self.thetaAboveDoubleSpinBox.value()]
         data={
@@ -202,9 +202,11 @@ class gui_handling(Ui_MainWindow):
                         shelf_num=data['Shelf']
                         if shelf_num==shelf_num_in_box:
                             if data['Sub shelf']==1:
-                                self.subShelfLineEdit.setText(data['Product'])
+                                for text in data['Product']:    
+                                    self.subShelfLineEdit.insert(f"{text},")
                             elif data['Sub shelf']==2:
-                                self.subShelfLineEdit_2.setText(data['Product'])
+                                for text in data['Product']:    
+                                    self.subShelfLineEdit_2.insert(f"{text},")
 
                             coor_from=data["From"]
                             coor_to=data["To"]
