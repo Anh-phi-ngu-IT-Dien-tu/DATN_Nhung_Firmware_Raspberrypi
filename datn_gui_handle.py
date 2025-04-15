@@ -1,12 +1,31 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtCore import QThread, pyqtSignal
 from datn_gui import Ui_MainWindow
 from robot_mqtt import *
 import sys
 import os
 import json
 import shutil
+import time
 
+
+class WorkerThread(QThread):
+    progress = pyqtSignal(int)
+
+    def __init__(self):
+        super().__init__()
+        self._running = True  # cờ điều khiển
+
+    def run(self):
+        count = 0
+        while self._running :
+            time.sleep(0.5)
+            count+=0.5
+            self.progress.emit(count)
+
+    def stop(self):
+        self._running = False
 
 ##This is how we create parallel task in qt5
 class gui_handling(Ui_MainWindow):
@@ -24,11 +43,14 @@ class gui_handling(Ui_MainWindow):
         self.portSpinBox.setValue(1883)
         self.BrokerLineEdit.setText("broker.emqx.io")
         self.GUITopicLineEdit.setText("GUI")
+        self.robotTopicLineEdit.setText("Robot")
         self.mqttConnectPushButton.clicked.connect(self.mqttStartButtonHandle)
         self.stopMqttPushButton.clicked.connect(self.mqttStopButtonHandle)
         self.sendSettingPushButton.clicked.connect(self.mqttSendSettingButtonHandle)
         self.stopMqttPushButton.setEnabled(False)
         self.sendSettingPushButton.setEnabled(False)
+        self.worker = WorkerThread()
+
 
         #shelf
 
@@ -91,15 +113,17 @@ class gui_handling(Ui_MainWindow):
         self.gui_mqtt.start_mqtt()
         msg=QMessageBox()
         msg.setWindowTitle("MQTT warning")
-        msg.setText("MQTT has been connected")
+        msg.setText("MQTT has been connected\nBegin waiting for data")
         msg.setIcon(QMessageBox.Information)
 
-        x=msg.exec_()
+       
         self.mqttConnectPushButton.setEnabled(False)
         self.sendSettingPushButton.setEnabled(True)
         self.stopMqttPushButton.setEnabled(True)
         self.BrokerLineEdit.setReadOnly(True)
         self.GUITopicLineEdit.setReadOnly(True)
+        self.start_thread()
+        x=msg.exec_()
            
        
     def mqttStopButtonHandle(self):
@@ -107,7 +131,7 @@ class gui_handling(Ui_MainWindow):
         self.gui_mqtt.disconnect()
         msg=QMessageBox()
         msg.setWindowTitle("MQTT warning")
-        msg.setText("MQTT has been disconnected")
+        msg.setText("MQTT has been disconnected\nStopping receiving data")
         msg.setIcon(QMessageBox.Information)
 
         x=msg.exec_()
@@ -117,6 +141,7 @@ class gui_handling(Ui_MainWindow):
         self.stopMqttPushButton.setEnabled(False)
         self.BrokerLineEdit.setReadOnly(False)
         self.GUITopicLineEdit.setReadOnly(False)
+        self.stop_thread()
     
 
     def mqttSendSettingButtonHandle(self):
@@ -128,7 +153,8 @@ class gui_handling(Ui_MainWindow):
                     with open(full_path,"r") as readfile:
                         data = json.load(readfile)
                         message=message+f'{data}/'
-                        
+        rbtext=self.robotTopicLineEdit.text()
+        message=message+f'{rbtext}'
         self.gui_mqtt.publish(self.gui_mqtt.topic,message)
         msg=QMessageBox()
         msg.setWindowTitle("MQTT warning")
@@ -136,8 +162,24 @@ class gui_handling(Ui_MainWindow):
         msg.setIcon(QMessageBox.Warning)
 
         x=msg.exec_()
-        
 
+    def start_thread(self):
+        if not self.worker.isRunning():
+            self.worker = WorkerThread()  # tạo mới nếu đã stop trước đó
+            self.worker.progress.connect(self.waitingDataThread)
+            self.worker.start()
+
+    def stop_thread(self):
+        if self.worker.isRunning():
+            self.worker.stop()
+
+    def waitingDataThread(self):
+        if self.gui_mqtt.message==None:
+            pass
+        else:
+            message=self.gui_mqtt.get_message()
+            self.debug(message)
+            self.stop_thread()
 
 #shelf 
 
@@ -166,10 +208,34 @@ class gui_handling(Ui_MainWindow):
 
     def addSubShelfButtonHandle(self):
         shelf=self.shelfIdSpinBox.value()
+        subshelf=self.subShelfIdSpinBox.value()
+        state=False
+        for root, dirs, files in os.walk(self.path):
+            for file in files:
+                if file.endswith(".json"):
+                    file_name=file.split('.')
+                    if file_name[0]==f"shelf{shelf}_{subshelf}":
+                        msg=QMessageBox()
+                        msg.setWindowTitle("Add shelf warning")
+                        msg.setText(f"shelf {shelf}_{subshelf} has already exist so new data will be written on old data")
+                        msg.setIcon(QMessageBox.Warning)
+                        x=msg.exec_()
+                        state=True
+                        break
+                    else:
+                        continue
+            if state==False:
+                msg=QMessageBox()
+                msg.setWindowTitle("Add shelf warning")
+                msg.setText(f"shelf {shelf}_{subshelf} will be added right now")
+                msg.setIcon(QMessageBox.Information)
+                x=msg.exec_()   
+
+                    
         if shelf not in self.shelf_existed:
             self.shelf_existed.add(shelf)
             self.shelfComboBox.addItem(f"Shelf {shelf}")
-        subshelf=self.subShelfIdSpinBox.value()
+       
         file=f"{self.path}/shelf{shelf}_{subshelf}.json"
         text=self.subShelfProductLineEdit.text()
         product=text.split(',')
@@ -184,6 +250,10 @@ class gui_handling(Ui_MainWindow):
         }
         with open(file,"w") as outfile:
             json.dump(data,outfile,indent=4)
+
+        with open(file,"r") as readfile:
+            data=str(json.load(readfile))
+            self.debug(data)
 
 
 #watch shelf

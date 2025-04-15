@@ -48,6 +48,11 @@ class Robot_MQTT_Position:
     def publish(self,topic="Robot",message=''):
         self.client.publish(topic, message)
 
+    def get_message(self):
+        message=self.message
+        self.message=None
+        return message
+
     def start_mqtt(self):
         self.client.loop_start()
 

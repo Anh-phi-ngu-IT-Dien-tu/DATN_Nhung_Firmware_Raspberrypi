@@ -558,14 +558,37 @@
     <widget class="QPushButton" name="sendSettingPushButton">
      <property name="geometry">
       <rect>
-       <x>550</x>
-       <y>80</y>
+       <x>670</x>
+       <y>90</y>
        <width>93</width>
        <height>28</height>
       </rect>
      </property>
      <property name="text">
       <string>Send setting</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>290</x>
+       <y>90</y>
+       <width>91</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Robot Topic</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="robotTopicLineEdit">
+     <property name="geometry">
+      <rect>
+       <x>410</x>
+       <y>90</y>
+       <width>151</width>
+       <height>22</height>
+      </rect>
      </property>
     </widget>
    </widget>
