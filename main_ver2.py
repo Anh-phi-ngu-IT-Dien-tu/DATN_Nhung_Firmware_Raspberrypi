@@ -18,7 +18,7 @@ else:
     shutil.rmtree(path) 
     os.mkdir(path)
 
-Shelf1_1=Shelf([],1,1,"shelf1_1",path)
+Shelf1_1=Shelf(["coca"],1,1,"shelf1_1",path)
 Shelf1_2=Shelf([],1,2,"shelf1_2",path)
 
 Shelf2_1=Shelf([],2,1,"shelf2_1",path)
@@ -56,10 +56,11 @@ while gui.message==None:
 
 print("We have received information")
 a=gui.get_message().split('/')
+print(a)
 robot_topic=None
-for i in range(len(a)):
-    if i!=len(a)-1:
-        c = ast.literal_eval(a[i])
+for b in a:
+    try:
+        c = ast.literal_eval(b)
         print(c['Product'])
         Shelf1_1.Load_shelf_information(c['Shelf'],c['Sub shelf'],c['Product'])
         Shelf1_2.Load_shelf_information(c['Shelf'],c['Sub shelf'],c['Product'])
@@ -73,8 +74,20 @@ for i in range(len(a)):
         Shelf4_1.Load_shelf_information(c['Shelf'],c['Sub shelf'],c['Product'])
         Shelf4_2.Load_shelf_information(c['Shelf'],c['Sub shelf'],c['Product'])
         Shelf4_pos.Load_shelf_position(c['Shelf'],c['From'],c['To'])
-    else:
-        robot_topic=a[i]
+    except:
+        pass
+print(Shelf1_1.oos_data)
+print(Shelf1_2.oos_data)
+Shelf1_1.write_data_to_json()
+Shelf2_1.write_data_to_json()
+Shelf1_2.write_data_to_json()
+Shelf2_2.write_data_to_json()
+Shelf3_1.write_data_to_json()
+Shelf3_2.write_data_to_json()
+Shelf4_1.write_data_to_json()
+Shelf4_2.write_data_to_json()
+gui.publish(gui.topic,a[-1])
+
 
 above_cam=Vision_ESP32("http://192.168.137.245/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Above_detection","Above_Out_of_stock")
 below_cam=Vision_ESP32("http://192.168.137.148/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Below_detection","Below_Out_of_stock")

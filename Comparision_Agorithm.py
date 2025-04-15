@@ -34,12 +34,7 @@ class Shelf:
         self.pre_state=False# to obtain the state if the robot is in range of shelf 1 or not
         self.state=False
         self.wrong_object_non_repeated_condition=False#condition for avoiding repeated data self.wrong_object_data
-        with open(self.wrong_object_file_name,"w") as outfile:
-            json.dump(self.wrong_object_data,outfile,indent=4)
-        with open(self.soos_file_name,"w") as outfile:
-            json.dump(self.soos_data,outfile,indent=4)
-        with open(self.oos_file_name,"w") as outfile:
-            json.dump(self.oos_data,outfile,indent=4)
+        self.write_data_to_json()
         pass
 
 
@@ -63,13 +58,7 @@ class Shelf:
             self.oos_data=dict.fromkeys(shelf,0)
             self.oos_data.update({"":0})
             self.seen_data=dict.fromkeys(shelf,0)
-            with open(self.wrong_object_file_name,"w") as outfile:
-                json.dump(self.wrong_object_data,outfile,indent=4)
-            with open(self.soos_file_name,"w") as outfile:
-                json.dump(self.soos_data,outfile,indent=4)
-            with open(self.oos_file_name,"w") as outfile:
-                json.dump(self.oos_data,outfile,indent=4)
-
+            self.write_data_to_json()
 
     def shelf_object_comparision(self,id=1,object_dictionary_list=[{"object":'247',"coordinate":np.array([0,0,0,0])}]):
         if id==self.shelf_id:
