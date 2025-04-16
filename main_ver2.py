@@ -14,7 +14,7 @@ path="./shelves_information_report"
 
 if not os.path.exists(path):
     os.mkdir(path)
-else:
+elif os.path.exists(path):
     shutil.rmtree(path) 
     os.mkdir(path)
 
@@ -30,10 +30,10 @@ Shelf3_2=Shelf([],3,2,"shelf3_2",path)
 Shelf4_1=Shelf([],4,1,"shelf4_1",path)
 Shelf4_2=Shelf([],4,2,"shelf4_2",path)
 
-Shelf1_pos=Shelf_Position()
-Shelf2_pos=Shelf_Position()
-Shelf3_pos=Shelf_Position()
-Shelf4_pos=Shelf_Position()
+Shelf1_pos=Shelf_Position(shelf_id=1)
+Shelf2_pos=Shelf_Position(shelf_id=2)
+Shelf3_pos=Shelf_Position(shelf_id=3)
+Shelf4_pos=Shelf_Position(shelf_id=4)
 
 allow_model=0
 allow_model2=0
@@ -76,43 +76,31 @@ for b in a:
         Shelf4_pos.Load_shelf_position(c['Shelf'],c['From'],c['To'])
     except:
         pass
-print(Shelf1_1.oos_data)
-print(Shelf1_2.oos_data)
-Shelf1_1.write_data_to_json()
-Shelf2_1.write_data_to_json()
-Shelf1_2.write_data_to_json()
-Shelf2_2.write_data_to_json()
-Shelf3_1.write_data_to_json()
-Shelf3_2.write_data_to_json()
-Shelf4_1.write_data_to_json()
-Shelf4_2.write_data_to_json()
+print(f"{Shelf1_pos.x_below} {Shelf1_pos.y_below} {Shelf1_pos.theta_below} {Shelf1_pos.x_above} {Shelf1_pos.y_above} {Shelf1_pos.theta_above}")
+print(f"{Shelf2_pos.x_below} {Shelf2_pos.y_below} {Shelf2_pos.theta_below} {Shelf2_pos.x_above} {Shelf2_pos.y_above} {Shelf2_pos.theta_above}")
 gui.publish(gui.topic,a[-1])
-
-
-above_cam=Vision_ESP32("http://192.168.137.245/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Above_detection","Above_Out_of_stock")
-below_cam=Vision_ESP32("http://192.168.137.148/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Below_detection","Below_Out_of_stock")
-above_cam2=Vision_ESP32("http://192.168.137.245/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Above_detection_2","Above_Out_of_stock_2")
-below_cam2=Vision_ESP32("http://192.168.137.148/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Below_detection_2","Below_Out_of_stock_2")
+robot_topic=a[-1]
 
 Robot_Pos=Robot_MQTT_Position(host="broker.emqx.io",topic=robot_topic)
 Robot_Pos.start_mqtt()
+
+above_cam=Vision_ESP32("http://192.168.137.122/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Above_detection","Above_Out_of_stock")
+below_cam=Vision_ESP32("http://192.168.137.98/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Below_detection","Below_Out_of_stock")
+# above_cam2=Vision_ESP32("http://192.168.137.245/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Above_detection_2","Above_Out_of_stock_2")
+# below_cam2=Vision_ESP32("http://192.168.137.148/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Below_detection_2","Below_Out_of_stock_2")
+
+
 
 def Shelf_Pos_Compare():
     global allow_model
     Shelf1_pos.compare_robot_shelf_position(Robot_Pos.x, Robot_Pos.y, Robot_Pos.theta)
     Shelf2_pos.compare_robot_shelf_position(Robot_Pos.x, Robot_Pos.y, Robot_Pos.theta)
     # Add logic for additional shelves
-    Shelf3_pos.compare_robot_shelf_position(Robot_Pos.x, Robot_Pos.y, Robot_Pos.theta)
-    Shelf4_pos.compare_robot_shelf_position(Robot_Pos.x, Robot_Pos.y, Robot_Pos.theta)
-
-    if Shelf1_pos.comparision_result and not Shelf2_pos.comparision_result:
+   
+    if Shelf1_pos.comparision_result==True and Shelf2_pos.comparision_result==False:
         allow_model = 1
-    elif Shelf2_pos.comparision_result and not Shelf1_pos.comparision_result:
+    elif Shelf2_pos.comparision_result==True and Shelf1_pos.comparision_result==False:
         allow_model = 2
-    elif Shelf3_pos.comparision_result and not (Shelf1_pos.comparision_result or Shelf2_pos.comparision_result):
-        allow_model = 3
-    elif Shelf4_pos.comparision_result and not (Shelf1_pos.comparision_result or Shelf2_pos.comparision_result or Shelf3_pos.comparision_result):
-        allow_model = 4
     else:
         allow_model = 0
 
@@ -121,52 +109,35 @@ def Shelf_Pos_Compare2():
     Shelf1_pos.compare_robot_shelf_position(Robot_Pos.x, Robot_Pos.y, Robot_Pos.theta)
     Shelf2_pos.compare_robot_shelf_position(Robot_Pos.x, Robot_Pos.y, Robot_Pos.theta)
     # Add logic for additional shelves
-    Shelf3_pos.compare_robot_shelf_position(Robot_Pos.x, Robot_Pos.y, Robot_Pos.theta)
-    Shelf4_pos.compare_robot_shelf_position(Robot_Pos.x, Robot_Pos.y, Robot_Pos.theta)
+  
 
-    if Shelf1_pos.comparision_result and not Shelf2_pos.comparision_result:
+    if Shelf1_pos.comparision_result==True and Shelf2_pos.comparision_result==False:
         allow_model2 = 1
-    elif Shelf2_pos.comparision_result and not Shelf1_pos.comparision_result:
+    elif Shelf2_pos.comparision_result==True and Shelf1_pos.comparision_result==False:
         allow_model2 = 2
-    elif Shelf3_pos.comparision_result and not (Shelf1_pos.comparision_result or Shelf2_pos.comparision_result):
-        allow_model2 = 3
-    elif Shelf4_pos.comparision_result and not (Shelf1_pos.comparision_result or Shelf2_pos.comparision_result or Shelf3_pos.comparision_result):
-        allow_model2 = 4
     else:
         allow_model2 = 0
 
 def Shelf_Pos_Compare3():
     global allow_model3
-    Shelf1_pos.compare_robot_shelf_position(Robot_Pos.x, Robot_Pos.y, Robot_Pos.theta)
-    Shelf2_pos.compare_robot_shelf_position(Robot_Pos.x, Robot_Pos.y, Robot_Pos.theta)
     Shelf3_pos.compare_robot_shelf_position(Robot_Pos.x, Robot_Pos.y, Robot_Pos.theta)
     Shelf4_pos.compare_robot_shelf_position(Robot_Pos.x, Robot_Pos.y, Robot_Pos.theta)
 
-    if Shelf1_pos.comparision_result and not (Shelf2_pos.comparision_result or Shelf3_pos.comparision_result or Shelf4_pos.comparision_result):
-        allow_model3 = 1
-    elif Shelf2_pos.comparision_result and not (Shelf1_pos.comparision_result or Shelf3_pos.comparision_result or Shelf4_pos.comparision_result):
-        allow_model3 = 2
-    elif Shelf3_pos.comparision_result and not (Shelf1_pos.comparision_result or Shelf2_pos.comparision_result or Shelf4_pos.comparision_result):
+    if Shelf3_pos.comparision_result and not Shelf4_pos.comparision_result:
         allow_model3 = 3
-    elif Shelf4_pos.comparision_result and not (Shelf1_pos.comparision_result or Shelf2_pos.comparision_result or Shelf3_pos.comparision_result):
-        allow_model3 = 4
+    elif Shelf4_pos.comparision_result and not Shelf3_pos.comparision_result:
+        allow_model3=4
     else:
         allow_model3 = 0
 
 def Shelf_Pos_Compare4():
     global allow_model4
-    Shelf1_pos.compare_robot_shelf_position(Robot_Pos.x, Robot_Pos.y, Robot_Pos.theta)
-    Shelf2_pos.compare_robot_shelf_position(Robot_Pos.x, Robot_Pos.y, Robot_Pos.theta)
     Shelf3_pos.compare_robot_shelf_position(Robot_Pos.x, Robot_Pos.y, Robot_Pos.theta)
     Shelf4_pos.compare_robot_shelf_position(Robot_Pos.x, Robot_Pos.y, Robot_Pos.theta)
 
-    if Shelf1_pos.comparision_result and not (Shelf2_pos.comparision_result or Shelf3_pos.comparision_result or Shelf4_pos.comparision_result):
-        allow_model4 = 1
-    elif Shelf2_pos.comparision_result and not (Shelf1_pos.comparision_result or Shelf3_pos.comparision_result or Shelf4_pos.comparision_result):
-        allow_model4 = 2
-    elif Shelf3_pos.comparision_result and not (Shelf1_pos.comparision_result or Shelf2_pos.comparision_result or Shelf4_pos.comparision_result):
+    if Shelf3_pos.comparision_result and not Shelf4_pos.comparision_result:
         allow_model4 = 3
-    elif Shelf4_pos.comparision_result and not (Shelf1_pos.comparision_result or Shelf2_pos.comparision_result or Shelf3_pos.comparision_result):
+    elif Shelf4_pos.comparision_result and not Shelf3_pos.comparision_result:
         allow_model4 = 4
     else:
         allow_model4 = 0
@@ -177,69 +148,75 @@ def Cam1():
     global allow_cam1
     global break_thread
     while True:
-        below_cam.Capture_frame()
-        if allow_cam1>10:
-            Shelf_Pos_Compare()
-            if allow_model==1 or allow_model ==2:
-                below_cam.ESP32_Vision_Model()
-                Shelf1_1.shelf_object_comparision(allow_model,below_cam.object_label_dict)
-                Shelf1_1.semi_out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict,0.7)
-                Shelf1_1.out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict)
+        try:
+            below_cam.Capture_frame()
+            if allow_cam1>10:
+                Shelf_Pos_Compare()
+                if allow_model==1 or allow_model ==2:
+                    below_cam.ESP32_Vision_Model()
+                    Shelf1_1.shelf_object_comparision(allow_model,below_cam.object_label_dict)
+                    Shelf1_1.semi_out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict,0.7)
+                    Shelf1_1.out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict)
 
-                Shelf2_1.shelf_object_comparision(allow_model,below_cam.object_label_dict)
-                Shelf2_1.semi_out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict,0.7)
-                Shelf2_1.out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict)
-                
-                Shelf1_1.seen_product_checking(allow_model,below_cam.object_label_dict)
-                Shelf2_1.seen_product_checking(allow_model,below_cam.object_label_dict)
+                    Shelf2_1.shelf_object_comparision(allow_model,below_cam.object_label_dict)
+                    Shelf2_1.semi_out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict,0.7)
+                    Shelf2_1.out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict)
+                    
+                    Shelf1_1.seen_product_checking(allow_model,below_cam.object_label_dict)
+                    Shelf2_1.seen_product_checking(allow_model,below_cam.object_label_dict)
 
-            elif allow_model==0:
-                Shelf1_1.seen_product_checking(allow_model,below_cam.object_label_dict)
-                Shelf2_1.seen_product_checking(allow_model,below_cam.object_label_dict)
+                elif allow_model==0:
+                    Shelf1_1.seen_product_checking(allow_model,below_cam.object_label_dict)
+                    Shelf2_1.seen_product_checking(allow_model,below_cam.object_label_dict)
 
 
-            print_out=f"{Robot_Pos.message} Shelf {allow_model}"
-            below_cam.show_result(print_out)
-            if cv2.waitKey(1)==ord('q') or break_thread==True:
-                break_thread=True
-                break
-            continue
-           
-        allow_cam1+=1
+                print_out=f"{Robot_Pos.message} Shelf {allow_model}"
+                below_cam.show_result(print_out)
+                if cv2.waitKey(1)==ord('q') or break_thread==True:
+                    break_thread=True
+                    break
+                continue
+            
+            allow_cam1+=1
+        except:
+            print("Error cam 1")
 
 def Cam2():
     global allow_model2
     global allow_cam2
     global break_thread
     while True:
-        above_cam.Capture_frame()
-        if allow_cam2>10:
-            Shelf_Pos_Compare2()
-            if allow_model2==1 or allow_model2 ==2:
-                above_cam.ESP32_Vision_Model()
-                Shelf1_2.shelf_object_comparision(allow_model2,above_cam.object_label_dict)
-                Shelf1_2.semi_out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict,0.7) 
-                Shelf1_2.out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict)        
+        try:
+            above_cam.Capture_frame()
+            if allow_cam2>10:
+                Shelf_Pos_Compare2()
+                if allow_model2==1 or allow_model2 ==2:
+                    above_cam.ESP32_Vision_Model()
+                    Shelf1_2.shelf_object_comparision(allow_model2,above_cam.object_label_dict)
+                    Shelf1_2.semi_out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict,0.7) 
+                    Shelf1_2.out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict)        
 
-                Shelf2_2.shelf_object_comparision(allow_model2,above_cam.object_label_dict)
-                Shelf2_2.semi_out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict,0.7) 
-                Shelf2_2.out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict)                      
+                    Shelf2_2.shelf_object_comparision(allow_model2,above_cam.object_label_dict)
+                    Shelf2_2.semi_out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict,0.7) 
+                    Shelf2_2.out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict)                      
 
-                Shelf1_2.seen_product_checking(allow_model2,above_cam.object_label_dict)
-                Shelf2_2.seen_product_checking(allow_model2,above_cam.object_label_dict)
+                    Shelf1_2.seen_product_checking(allow_model2,above_cam.object_label_dict)
+                    Shelf2_2.seen_product_checking(allow_model2,above_cam.object_label_dict)
 
-            elif allow_model2==0:
-                Shelf1_2.seen_product_checking(allow_model2,above_cam.object_label_dict)
-                Shelf2_2.seen_product_checking(allow_model2,above_cam.object_label_dict)
-            
+                elif allow_model2==0:
+                    Shelf1_2.seen_product_checking(allow_model2,above_cam.object_label_dict)
+                    Shelf2_2.seen_product_checking(allow_model2,above_cam.object_label_dict)
+                
 
-            print_out=f"{Robot_Pos.message} Shelf {allow_model2}"
-            above_cam.show_result(print_out)
-            if cv2.waitKey(1)==ord('q') or break_thread==True:
-                break_thread=True
-                break
-            continue
-        allow_cam2+=1    
+                print_out=f"{Robot_Pos.message} Shelf {allow_model2}"
+                above_cam.show_result(print_out)
+                if cv2.waitKey(1)==ord('q') or break_thread==True:
+                    break_thread=True
+                    break
+                continue
+            allow_cam2+=1
+        except:
+            print("Error cam 2")
 
 
 def Cam3():
@@ -269,7 +246,7 @@ def Cam3():
 
             print_out = f"{Robot_Pos.message} Shelf {allow_model3}"
             above_cam2.show_result(print_out)
-            if cv2.waitKey(1) == ord('q') or break_thread:
+            if cv2.waitKey(1) == ord('q') or break_thread==True:
                 break_thread = True
                 break
             continue
@@ -345,6 +322,7 @@ for root, dirs, files in os.walk(path):
                 message=message+f'{data}\n'
 
 gui.publish(gui.topic,message)
+print(message)
 gui.stop_mqtt()
                         
                         
