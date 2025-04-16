@@ -101,7 +101,7 @@ class gui_handling(Ui_MainWindow):
 
 
     def debug(self,str=""):
-        self.textBrowser.setPlainText(str)
+        self.textBrowser.setText(str)
 
 
 ##  mqtt
@@ -168,10 +168,24 @@ class gui_handling(Ui_MainWindow):
             self.worker = WorkerThread()  # tạo mới nếu đã stop trước đó
             self.worker.progress.connect(self.waitingDataThread)
             self.worker.start()
+        else:
+            msg=QMessageBox()
+            msg.setWindowTitle("MQTT warning")
+            msg.setText("MQTT has already connected")
+            msg.setIcon(QMessageBox.Warning)
+
+            x=msg.exec_()
 
     def stop_thread(self):
         if self.worker.isRunning():
             self.worker.stop()
+        else:
+            msg=QMessageBox()
+            msg.setWindowTitle("MQTT warning")
+            msg.setText("MQTT has already stopped")
+            msg.setIcon(QMessageBox.Warning)
+
+            x=msg.exec_()
 
     def waitingDataThread(self):
         if self.gui_mqtt.message==None:
@@ -180,7 +194,7 @@ class gui_handling(Ui_MainWindow):
         else:
             message=self.gui_mqtt.get_message()
             self.debug(message)
-            self.stop_thread()
+            
 
 #shelf 
 
