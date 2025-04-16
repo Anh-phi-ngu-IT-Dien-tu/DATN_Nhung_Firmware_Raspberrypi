@@ -189,7 +189,6 @@ class gui_handling(Ui_MainWindow):
 
     def waitingDataThread(self):
         if self.gui_mqtt.message==None:
-            self.debug("")
             pass
         else:
             message=self.gui_mqtt.get_message()
