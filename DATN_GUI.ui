@@ -435,6 +435,9 @@
        <height>151</height>
       </rect>
      </property>
+     <property name="maxLength">
+      <number>32778</number>
+     </property>
     </widget>
    </widget>
    <widget class="QGroupBox" name="mqttGroupBox">
