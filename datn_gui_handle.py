@@ -69,7 +69,7 @@ class gui_handling(Ui_MainWindow):
         self.deleteProductPushButton.clicked.connect(self.deleteProductButtonHandle)      
         self.resetShelfPushButton.clicked.connect(self.resetShelfButtonHandle)
         self.addSubShelfPushButton.clicked.connect(self.addSubShelfButtonHandle)
-       
+        self.deleteSubShelfPushButton.clicked.connect(self.deleteSubShelfButtonHandle)
 
 
         #watch shelf
@@ -254,6 +254,55 @@ class gui_handling(Ui_MainWindow):
         with open(file,"r") as readfile:
             data=str(json.load(readfile))
             self.debug(data)
+    
+    def deleteSubShelfButtonHandle(self):
+        shelf=self.shelfIdSpinBox.value()
+        subshelf=self.subShelfIdSpinBox.value()
+        state=False
+        for root, dirs, files in os.walk(self.path):
+            for file in files:
+                if file.endswith(".json"):
+                    file_name=file.split('.')
+                    if file_name[0]==f"shelf{shelf}_{subshelf}":
+                        msg=QMessageBox()
+                        msg.setWindowTitle("Delete shelf warning")
+                        msg.setText(f"Deleting shelf {shelf}_{subshelf} ")
+                        msg.setIcon(QMessageBox.Warning)
+                        x=msg.exec_()
+                        full_path=os.path.join(root,file)
+                        os.remove(full_path)
+                        state=True
+                        break
+                    else:
+                        continue
+            
+            if state==False:
+                msg=QMessageBox()
+                msg.setWindowTitle("Deleting shelf warning")
+                msg.setText(f"{shelf}_{subshelf} has already been deleted")
+                msg.setIcon(QMessageBox.Information)
+                x=msg.exec_() 
+
+        num={0}
+        for root, dirs, files in os.walk(self.path):
+            for file in files:
+                if file.endswith(".json"):
+                    file_name=file.split('.')
+                    t=int(file_name[0].replace("shelf","").split('_')[0])
+                    num.add(t)
+        
+        temp={0}
+        temp.remove(0)
+        for j in self.shelf_existed:
+            if j not in num:
+                temp.add(j)
+                self.shelfComboBox.removeItem(self.shelfComboBox.findText(f"Shelf {j}"))
+        
+        for k in temp:
+            self.shelf_existed.remove(k)
+
+            
+
 
 
 #watch shelf
