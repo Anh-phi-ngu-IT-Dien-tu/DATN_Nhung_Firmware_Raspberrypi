@@ -426,17 +426,17 @@
     <property name="title">
      <string>Debug</string>
     </property>
-    <widget class="QLineEdit" name="debugLineEdit">
+    <widget class="QTextBrowser" name="debugTextBrowser">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>20</y>
+       <y>30</y>
        <width>781</width>
-       <height>151</height>
+       <height>141</height>
       </rect>
      </property>
-     <property name="maxLength">
-      <number>99997</number>
+     <property name="tabStopWidth">
+      <number>150</number>
      </property>
     </widget>
    </widget>

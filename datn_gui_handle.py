@@ -101,7 +101,7 @@ class gui_handling(Ui_MainWindow):
 
 
     def debug(self,str=""):
-        self.debugLineEdit.setText(str)
+        self.debugTextBrowser.setPlainText(str)
 
 
 ##  mqtt
