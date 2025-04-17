@@ -9,6 +9,7 @@ import shutil
 import time
 import json
 import ast
+from datetime import datetime
 
 path="./shelves_information_report"
 
@@ -328,7 +329,14 @@ for root, dirs, files in os.walk(path):
                 data = json.load(readfile)
             message=message+f'{file} result: {data}\n'
             
-
+now=datetime.now()
+day=now.day
+month=now.month
+year=now.year
+hour=now.hour
+minute=now.minute
+second=now.second
+message=message+f"date: {day}/{month}/{year} time: {hour}:{minute}:{second} \n"
 gui.publish(gui.topic,message)
 gui.stop_mqtt()
                         
