@@ -65,11 +65,11 @@ class gui_handling(Ui_MainWindow):
 
         self.productComboBox.addItems(['247', 'Chinsu', 'ChocoPie', 'D.Thanh', 'Heineken', 'Oreo', 'Pepsi-xanh', 'Redbull', 'Revive-chanh', 'Simply', 'TH true Milk', 'Tea Plus', 'Vinamilk', 'coca', 'coca-chai', 'custas', 'fanta-cam', 'khongdo', 'number1', 'sprite-lon', 'sting', 'vinhhao'])
         self.addProductPushButton.clicked.connect(self.addProductButtonHandle) 
-        self.subShelfProductLineEdit.setReadOnly(True) 
         self.deleteProductPushButton.clicked.connect(self.deleteProductButtonHandle)      
         self.resetShelfPushButton.clicked.connect(self.resetShelfButtonHandle)
         self.addSubShelfPushButton.clicked.connect(self.addSubShelfButtonHandle)
         self.deleteSubShelfPushButton.clicked.connect(self.deleteSubShelfButtonHandle)
+        self.loadSubShelfPushButton.clicked.connect(self.loadSubShelfButtonHandle)
 
 
         #watch shelf
@@ -302,7 +302,56 @@ class gui_handling(Ui_MainWindow):
             self.shelf_existed.remove(k)
 
             
+    def loadSubShelfButtonHandle(self):
+        shelf=self.shelfIdSpinBox.value()
+        subshelf=self.subShelfIdSpinBox.value()
+        state=False
+        for root, dirs, files in os.walk(self.path):
+            for file in files:
+                if file.endswith(".json"):
+                    file_name=file.split('.')
+                    if file_name[0]==f"shelf{shelf}_{subshelf}":
+                        msg=QMessageBox()
+                        msg.setWindowTitle("Load shelf warning")
+                        msg.setText(f"Loading shelf {shelf}_{subshelf} ")
+                        msg.setIcon(QMessageBox.Information)
+                        x=msg.exec_()
+                        full_path=os.path.join(root,file)
+                        with open(full_path,"r") as readfile:
+                            data=json.load(readfile)
+                        text_data=data['Product']
+                        text=''
+                        for t in text_data:
+                            text=text+f",{t}"
+                        text=text.replace(',','',1)
+                        self.subShelfProductLineEdit.setText(text)
+                        below=data['From']
+                        above=data['To']
+                        self.xBelowDoubleSpinBox.setValue(below[0])
+                        self.yBelowDoubleSpinBox.setValue(below[1])
+                        self.thetaBelowDoubleSpinBox.setValue(below[2])
+                        self.xAboveDoubleSpinBox.setValue(above[0])
+                        self.yAboveDoubleSpinBox.setValue(above[1])
+                        self.thetaAboveDoubleSpinBox.setValue(above[2])
+                        state=True
+                        file=f"{self.path}/shelf{shelf}_{subshelf}.json"
+                        with open(file,"r") as readfile:
+                            data=str(json.load(readfile))
+                            self.debug(data)
 
+                        state=True
+                        break
+                    else:
+                        continue
+            
+            if state==False:
+                msg=QMessageBox()
+                msg.setWindowTitle("Loading shelf warning")
+                msg.setText(f"{shelf}_{subshelf} does not exist")
+                msg.setIcon(QMessageBox.Information)
+                x=msg.exec_() 
+
+        
 
 
 #watch shelf
@@ -329,16 +378,17 @@ class gui_handling(Ui_MainWindow):
                                 for text in data['Product']:    
                                     self.subShelfLineEdit_2.insert(f"{text},")
 
-                            coor_from=data["From"]
-                            coor_to=data["To"]
+                            if data['Sub shelf']==1:
+                                coor_from=data["From"]
+                                coor_to=data["To"]
 
-                            self.xFromDoubleSpinBox.setValue(coor_from[0])
-                            self.yFromDoubleSpinBox.setValue(coor_from[1])
-                            self.thetaFromDoubleSpinBox.setValue(coor_from[2])
+                                self.xFromDoubleSpinBox.setValue(coor_from[0])
+                                self.yFromDoubleSpinBox.setValue(coor_from[1])
+                                self.thetaFromDoubleSpinBox.setValue(coor_from[2])
 
-                            self.xToDoubleSpinBox.setValue(coor_to[0])
-                            self.yToDoubleSpinBox.setValue(coor_to[1])
-                            self.thetaToDoubleSpinBox.setValue(coor_to[2])
+                                self.xToDoubleSpinBox.setValue(coor_to[0])
+                                self.yToDoubleSpinBox.setValue(coor_to[1])
+                                self.thetaToDoubleSpinBox.setValue(coor_to[2])
 
 
                         else:
