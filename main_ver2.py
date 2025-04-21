@@ -31,10 +31,10 @@ Shelf3_2=Shelf([],3,2,"shelf3_2",path)
 Shelf4_1=Shelf([],4,1,"shelf4_1",path)
 Shelf4_2=Shelf([],4,2,"shelf4_2",path)
 
-Shelf1_pos=Shelf_Position(shelf_id=1)
-Shelf2_pos=Shelf_Position(shelf_id=2)
-Shelf3_pos=Shelf_Position(shelf_id=3)
-Shelf4_pos=Shelf_Position(shelf_id=4)
+Shelf1_pos=Shelf_Position(shelf_id=1,shelf_path=path)
+Shelf2_pos=Shelf_Position(shelf_id=2,shelf_path=path)
+Shelf3_pos=Shelf_Position(shelf_id=3,shelf_path=path)
+Shelf4_pos=Shelf_Position(shelf_id=4,shelf_path=path)
 
 allow_model=0
 allow_model2=0
@@ -80,10 +80,10 @@ robot_topic=a[-1]
 Robot_Pos=Robot_MQTT_Position(host="broker.emqx.io",topic=robot_topic)
 Robot_Pos.start_mqtt()
 
-above_cam=Vision_ESP32("http://192.168.137.228/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Above_detection","Above_Out_of_stock")
-below_cam=Vision_ESP32("http://192.168.137.128/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Below_detection","Below_Out_of_stock")
-above_cam2=Vision_ESP32("http://192.168.137.13/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Above_detection_2","Above_Out_of_stock_2")
-below_cam2=Vision_ESP32("http://192.168.137.20/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Below_detection_2","Below_Out_of_stock_2")
+above_cam=Vision_ESP32("http://192.168.137.235/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Above_detection","Above_Out_of_stock")
+below_cam=Vision_ESP32("http://192.168.137.138/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Below_detection","Below_Out_of_stock")
+above_cam2=Vision_ESP32("http://192.168.137.245/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Above_detection_2","Above_Out_of_stock_2")
+below_cam2=Vision_ESP32("http://192.168.137.26/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Below_detection_2","Below_Out_of_stock_2")
 
 
 
@@ -141,151 +141,154 @@ def Shelf_Pos_Compare4():
 
 def Cam1():
     global allow_model
-    global allow_cam1
     global break_thread
     while True:
         try:
-            below_cam.Capture_frame()
-            if allow_cam1>10:
-                Shelf_Pos_Compare()
-                if allow_model==1 or allow_model ==2:
-                    below_cam.ESP32_Vision_Model()
-                    Shelf1_1.shelf_object_comparision(allow_model,below_cam.object_label_dict)
-                    Shelf1_1.semi_out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict,0.7)
-                    Shelf1_1.out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict)
+            below_cam.Capture_frame()        
+            Shelf_Pos_Compare()
+            if allow_model==1 or allow_model ==2:
+                below_cam.ESP32_Vision_Model()
+                Shelf1_1.shelf_object_comparision(allow_model,below_cam.object_label_dict)
+                Shelf1_1.semi_out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict,0.7)
+                Shelf1_1.out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict)
 
-                    Shelf2_1.shelf_object_comparision(allow_model,below_cam.object_label_dict)
-                    Shelf2_1.semi_out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict,0.7)
-                    Shelf2_1.out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict)
-                    
-                    Shelf1_1.seen_product_checking(allow_model,below_cam.object_label_dict)
-                    Shelf2_1.seen_product_checking(allow_model,below_cam.object_label_dict)
+                Shelf2_1.shelf_object_comparision(allow_model,below_cam.object_label_dict)
+                Shelf2_1.semi_out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict,0.7)
+                Shelf2_1.out_of_stock_checking(allow_model,below_cam.object_label_dict,below_cam.stock_stage_label_dict)
+                
+                Shelf1_1.seen_product_checking(allow_model,below_cam.object_label_dict)
+                Shelf2_1.seen_product_checking(allow_model,below_cam.object_label_dict)
 
-                elif allow_model==0:
-                    Shelf1_1.seen_product_checking(allow_model,below_cam.object_label_dict)
-                    Shelf2_1.seen_product_checking(allow_model,below_cam.object_label_dict)
+            elif allow_model==0:
+                Shelf1_1.seen_product_checking(allow_model,below_cam.object_label_dict)
+                Shelf2_1.seen_product_checking(allow_model,below_cam.object_label_dict)
 
 
-                print_out=f"{Robot_Pos.message} Shelf {allow_model}"
-                below_cam.show_result(print_out)
-                if cv2.waitKey(1)==ord('q') or break_thread==True:
-                    break_thread=True
-                    break
-                continue
-            
-            allow_cam1+=1
-        except:
+            print_out=f"{Robot_Pos.message} Shelf {allow_model}"
+            below_cam.show_result(print_out)
+            if cv2.waitKey(1)==ord('q') or break_thread==True:
+                break_thread=True
+                Shelf1_1.write_data_to_json()
+                Shelf2_1.write_data_to_json()
+                break
+            continue
+        except KeyboardInterrupt:
+            Shelf1_1.write_data_to_json()
+            Shelf2_1.write_data_to_json()
             pass
 
 def Cam2():
     global allow_model2
-    global allow_cam2
     global break_thread
     while True:
         try:
             above_cam.Capture_frame()
-            if allow_cam2>10:
-                Shelf_Pos_Compare2()
-                if allow_model2==1 or allow_model2 ==2:
-                    above_cam.ESP32_Vision_Model()
-                    Shelf1_2.shelf_object_comparision(allow_model2,above_cam.object_label_dict)
-                    Shelf1_2.semi_out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict,0.7) 
-                    Shelf1_2.out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict)        
+            Shelf_Pos_Compare2()
+            if allow_model2==1 or allow_model2 ==2:
+                above_cam.ESP32_Vision_Model()
+                Shelf1_2.shelf_object_comparision(allow_model2,above_cam.object_label_dict)
+                Shelf1_2.semi_out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict,0.7) 
+                Shelf1_2.out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict)        
 
-                    Shelf2_2.shelf_object_comparision(allow_model2,above_cam.object_label_dict)
-                    Shelf2_2.semi_out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict,0.7) 
-                    Shelf2_2.out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict)                      
+                Shelf2_2.shelf_object_comparision(allow_model2,above_cam.object_label_dict)
+                Shelf2_2.semi_out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict,0.7) 
+                Shelf2_2.out_of_stock_checking(allow_model2,above_cam.object_label_dict,above_cam.stock_stage_label_dict)                      
 
-                    Shelf1_2.seen_product_checking(allow_model2,above_cam.object_label_dict)
-                    Shelf2_2.seen_product_checking(allow_model2,above_cam.object_label_dict)
+                Shelf1_2.seen_product_checking(allow_model2,above_cam.object_label_dict)
+                Shelf2_2.seen_product_checking(allow_model2,above_cam.object_label_dict)
 
-                elif allow_model2==0:
-                    Shelf1_2.seen_product_checking(allow_model2,above_cam.object_label_dict)
-                    Shelf2_2.seen_product_checking(allow_model2,above_cam.object_label_dict)
-                
+            elif allow_model2==0:
+                Shelf1_2.seen_product_checking(allow_model2,above_cam.object_label_dict)
+                Shelf2_2.seen_product_checking(allow_model2,above_cam.object_label_dict)
+            
 
-                print_out=f"{Robot_Pos.message} Shelf {allow_model2}"
-                above_cam.show_result(print_out)
-                if cv2.waitKey(1)==ord('q') or break_thread==True:
-                    break_thread=True
-                    break
-                continue
-            allow_cam2+=1
-        except:
+            print_out=f"{Robot_Pos.message} Shelf {allow_model2}"
+            above_cam.show_result(print_out)
+            if cv2.waitKey(1)==ord('q') or break_thread==True:
+                break_thread=True
+                Shelf1_2.write_data_to_json()
+                Shelf2_2.write_data_to_json()
+                break
+            continue
+        except KeyboardInterrupt:
+            Shelf1_2.write_data_to_json()
+            Shelf2_2.write_data_to_json()
             pass
 
 
 def Cam3():
     global allow_model3
-    global allow_cam3
     global break_thread
     while True:
         try:
             above_cam2.Capture_frame()
-            if allow_cam3 > 10:
-                Shelf_Pos_Compare3()
-                if allow_model3 == 3 or allow_model3 == 4:
-                    above_cam2.ESP32_Vision_Model()
-                    Shelf3_2.shelf_object_comparision(allow_model3, above_cam2.object_label_dict)
-                    Shelf3_2.semi_out_of_stock_checking(allow_model3, above_cam2.object_label_dict, above_cam2.stock_stage_label_dict, 0.7)
-                    Shelf3_2.out_of_stock_checking(allow_model3, above_cam2.object_label_dict, above_cam2.stock_stage_label_dict)
+            Shelf_Pos_Compare3()
+            if allow_model3 == 3 or allow_model3 == 4:
+                above_cam2.ESP32_Vision_Model()
+                Shelf3_2.shelf_object_comparision(allow_model3, above_cam2.object_label_dict)
+                Shelf3_2.semi_out_of_stock_checking(allow_model3, above_cam2.object_label_dict, above_cam2.stock_stage_label_dict, 0.7)
+                Shelf3_2.out_of_stock_checking(allow_model3, above_cam2.object_label_dict, above_cam2.stock_stage_label_dict)
 
-                    Shelf4_2.shelf_object_comparision(allow_model3, above_cam2.object_label_dict)
-                    Shelf4_2.semi_out_of_stock_checking(allow_model3, above_cam2.object_label_dict, above_cam2.stock_stage_label_dict, 0.7)
-                    Shelf4_2.out_of_stock_checking(allow_model3, above_cam2.object_label_dict, above_cam2.stock_stage_label_dict)
+                Shelf4_2.shelf_object_comparision(allow_model3, above_cam2.object_label_dict)
+                Shelf4_2.semi_out_of_stock_checking(allow_model3, above_cam2.object_label_dict, above_cam2.stock_stage_label_dict, 0.7)
+                Shelf4_2.out_of_stock_checking(allow_model3, above_cam2.object_label_dict, above_cam2.stock_stage_label_dict)
 
-                    Shelf3_2.seen_product_checking(allow_model3, above_cam2.object_label_dict)
-                    Shelf4_2.seen_product_checking(allow_model3, above_cam2.object_label_dict)
+                Shelf3_2.seen_product_checking(allow_model3, above_cam2.object_label_dict)
+                Shelf4_2.seen_product_checking(allow_model3, above_cam2.object_label_dict)
 
-                elif allow_model3 == 0:
-                    Shelf3_2.seen_product_checking(allow_model3, above_cam2.object_label_dict)
-                    Shelf4_2.seen_product_checking(allow_model3, above_cam2.object_label_dict)
+            elif allow_model3 == 0:
+                Shelf3_2.seen_product_checking(allow_model3, above_cam2.object_label_dict)
+                Shelf4_2.seen_product_checking(allow_model3, above_cam2.object_label_dict)
 
-                print_out = f"{Robot_Pos.message} Shelf {allow_model3}"
-                above_cam2.show_result(print_out)
-                if cv2.waitKey(1) == ord('q') or break_thread==True:
-                    break_thread = True
-                    break
-                continue
-            allow_cam3 += 1
-        except:
+            print_out = f"{Robot_Pos.message} Shelf {allow_model3}"
+            above_cam2.show_result(print_out)
+            if cv2.waitKey(1) == ord('q') or break_thread==True:
+                break_thread = True
+                Shelf3_2.write_data_to_json()
+                Shelf4_2.write_data_to_json()
+                break
+            continue
+        except KeyboardInterrupt:
+            Shelf3_2.write_data_to_json()
+            Shelf4_2.write_data_to_json()
             pass
 
 
 def Cam4():
     global allow_model4
-    global allow_cam4
     global break_thread
     while True:
         try:
             below_cam2.Capture_frame()
-            if allow_cam4 > 10:
-                Shelf_Pos_Compare4()
-                if allow_model4 == 3 or allow_model4 == 4:
-                    below_cam2.ESP32_Vision_Model()
-                    Shelf3_1.shelf_object_comparision(allow_model4, below_cam2.object_label_dict)
-                    Shelf3_1.semi_out_of_stock_checking(allow_model4, below_cam2.object_label_dict, below_cam2.stock_stage_label_dict, 0.7)
-                    Shelf3_1.out_of_stock_checking(allow_model4, below_cam2.object_label_dict, below_cam2.stock_stage_label_dict)
+            Shelf_Pos_Compare4()
+            if allow_model4 == 3 or allow_model4 == 4:
+                below_cam2.ESP32_Vision_Model()
+                Shelf3_1.shelf_object_comparision(allow_model4, below_cam2.object_label_dict)
+                Shelf3_1.semi_out_of_stock_checking(allow_model4, below_cam2.object_label_dict, below_cam2.stock_stage_label_dict, 0.7)
+                Shelf3_1.out_of_stock_checking(allow_model4, below_cam2.object_label_dict, below_cam2.stock_stage_label_dict)
 
-                    Shelf4_1.shelf_object_comparision(allow_model4, below_cam2.object_label_dict)
-                    Shelf4_1.semi_out_of_stock_checking(allow_model4, below_cam2.object_label_dict, below_cam2.stock_stage_label_dict, 0.7)
-                    Shelf4_1.out_of_stock_checking(allow_model4, below_cam2.object_label_dict, below_cam2.stock_stage_label_dict)
+                Shelf4_1.shelf_object_comparision(allow_model4, below_cam2.object_label_dict)
+                Shelf4_1.semi_out_of_stock_checking(allow_model4, below_cam2.object_label_dict, below_cam2.stock_stage_label_dict, 0.7)
+                Shelf4_1.out_of_stock_checking(allow_model4, below_cam2.object_label_dict, below_cam2.stock_stage_label_dict)
 
-                    Shelf3_1.seen_product_checking(allow_model4, below_cam2.object_label_dict)
-                    Shelf4_1.seen_product_checking(allow_model4, below_cam2.object_label_dict)
+                Shelf3_1.seen_product_checking(allow_model4, below_cam2.object_label_dict)
+                Shelf4_1.seen_product_checking(allow_model4, below_cam2.object_label_dict)
 
-                elif allow_model4 == 0:
-                    Shelf3_1.seen_product_checking(allow_model4, below_cam2.object_label_dict)
-                    Shelf4_1.seen_product_checking(allow_model4, below_cam2.object_label_dict)
+            elif allow_model4 == 0:
+                Shelf3_1.seen_product_checking(allow_model4, below_cam2.object_label_dict)
+                Shelf4_1.seen_product_checking(allow_model4, below_cam2.object_label_dict)
 
-                print_out = f"{Robot_Pos.message} Shelf {allow_model4}"
-                below_cam2.show_result(print_out)
-                if cv2.waitKey(1) == ord('q') or break_thread:
-                    break_thread = True
-                    break
-                continue
-            allow_cam4 += 1
-        except:
+            print_out = f"{Robot_Pos.message} Shelf {allow_model4}"
+            below_cam2.show_result(print_out)
+            if cv2.waitKey(1) == ord('q') or break_thread:
+                break_thread = True
+                Shelf3_1.write_data_to_json()
+                Shelf4_1.write_data_to_json()
+                break
+            continue
+        except KeyboardInterrupt:
+            Shelf3_1.write_data_to_json()
+            Shelf4_1.write_data_to_json()
             pass
 
 
@@ -293,7 +296,7 @@ t1=threading.Thread(target=Cam1,daemon=True)
 t2=threading.Thread(target=Cam2,daemon=True)
 t3=threading.Thread(target=Cam3,daemon=True)
 t4=threading.Thread(target=Cam4,daemon=True)
-
+ 
 
 t1.start()
 t2.start()
@@ -309,14 +312,6 @@ t4.join()
 
 
 cv2.destroyAllWindows()
-Shelf1_1.write_data_to_json()
-Shelf2_1.write_data_to_json()
-Shelf1_2.write_data_to_json()
-Shelf2_2.write_data_to_json()
-Shelf3_1.write_data_to_json()
-Shelf3_2.write_data_to_json()
-Shelf4_1.write_data_to_json()
-Shelf4_2.write_data_to_json()
 Robot_Pos.stop_mqtt()
 
 message=''

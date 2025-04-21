@@ -1,6 +1,7 @@
 import json
 import numpy as np
 import os
+import math
 
 class Shelf:
     def __init__(self,shelf=["object1","object2","object3"],shelf_id=1,shelf_sub_id=1,shelf_name="shelf1_1",shelf_path="./shelf_info_report"):
@@ -260,7 +261,7 @@ class Shelf:
 
 
 class Shelf_Position:
-    def __init__(self,shelf_id=1,x_below=0.0,x_above=0.0,y_below=0.0,y_above=0.0,theta_below=0.0,theta_above=0.0):
+    def __init__(self,shelf_id=1,x_below=0.0,x_above=0.0,y_below=0.0,y_above=0.0,theta_below=0.0,theta_above=0.0,shelf_path="./shelf_info_report",using_theta=True):
         self.shelf_id=shelf_id
         self.already_written=False
         self.x_below=x_below
@@ -269,7 +270,10 @@ class Shelf_Position:
         self.y_above=y_above
         self.theta_below=theta_below
         self.theta_above=theta_above
+        self.theta_condition=False
         self.comparision_result=False
+        self.using_theta=using_theta
+        self.file_name=f"{shelf_path}/Shelf_{self.shelf_id}_position.json"
         pass
 
     def Load_shelf_position(self,id=1,below_coordinate=[0.0,0.0,0.0],above_coordinate=[0.0,0.0,0.0]):
@@ -281,11 +285,49 @@ class Shelf_Position:
             self.theta_below=below_coordinate[2]
             self.theta_above=above_coordinate[2]
             self.already_written=True
+            data={
+                'From':[self.x_below,self.y_below,self.theta_below],
+                'To':[self.x_above,self.y_above,self.theta_above]
+            }
+            with open(self.file_name,"w") as outfile:
+                json.dump(data,outfile)
 
     def compare_robot_shelf_position(self,x,y,theta):
-        if self.x_below<=x<=self.x_above and self.y_below<=y<=self.y_above and self.theta_below<=theta<=self.theta_above:
-            self.comparision_result=True
+        if self.using_theta==True:
+            self.compare_robot_theta(theta)
+            if self.x_below<x<self.x_above and self.y_below<y<self.y_above and self.theta_condition==True:
+                self.comparision_result=True
+            else:
+                self.comparision_result=False   
         else:
-            self.comparision_result=False
+            if self.x_below<x<self.x_above and self.y_below<y<self.y_above:
+                self.comparision_result=True
+            else:
+                self.comparision_result=False
         return self.comparision_result
+        
+    def compare_robot_theta(self,theta):
+        theta_range=abs(self.theta_above-self.theta_below)
+        if theta_range>=np.pi:
+            if theta<0:
+                    theta_in=2*np.pi+theta
+            else:
+                theta_in=theta    
+            if self.theta_above>0 and self.theta_below<0:
+                theta_below=2*np.pi+self.theta_below
+                theta_above=self.theta_above
+                if  theta_above<theta_in<theta_below:
+                    self.theta_condition=True
+                else:
+                    self.theta_condition=False
+            else:
+                self.theta_condition=False            
+        else:
+            if  self.theta_below<theta<self.theta_above:
+                self.theta_condition=True
+            else:
+                self.theta_condition=False
+
+            
+
 
