@@ -33,8 +33,13 @@ class gui_handling(Ui_MainWindow):
         self.main_window=QtWidgets.QMainWindow()
         self.setupUi(self.main_window)
 
-        self.noteTextBrowser.setPlainText("The coordinate of every shelves are defined following sub shelf" \
-        " 1. User should define sub shelf 2 coordinate the same as sub shelf 1")
+        self.noteTextBrowser.setPlainText("1. The coordinate of every shelves are defined following sub shelf. " \
+        "User should define sub shelf 2 coordinate the same as sub shelf 1\n\n" \
+        "2. The coordinate values always follow the rule that \"From\" values are smaller than \"To\" values\n\n" \
+        "3. With theta values, keep following the the rule but make sure the range is smaller than pi or else the logic of " \
+        "algorithm might have a problem. If between theta range there is pi, keep assign the values following the rule, the " \
+        "algorithm will handle the pi overfloating problem\n\n" \
+        "4. Robot will return a theta value in range (-pi,pi)")
 
         ### mqtt worker
         self.mqtt_worker = None
