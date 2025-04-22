@@ -291,23 +291,52 @@ def Cam4():
             Shelf4_1.write_data_to_json()
             pass
 
+def Sending():
+    global allow_model,allow_model2,allow_model3,allow_model4
+    message=''
+    while True:
+        message=''
+        if allow_model!=0 or allow_model2!=0 or allow_model3!=0 or allow_model4!=0:
+            data=f"Shelf1_1 status: Wrong object :{Shelf1_1.wrong_object_data} -- SOOS:{Shelf1_1.soos_data} -- OOS:{Shelf1_1.oos_data}\n"
+            data2=f"Shelf1_2 status: Wrong object :{Shelf1_2.wrong_object_data} -- SOOS:{Shelf1_2.soos_data} -- OOS:{Shelf1_2.oos_data}\n"
+            data3=f"Shelf2_1 status: Wrong object :{Shelf2_1.wrong_object_data} -- SOOS:{Shelf2_1.soos_data} -- OOS:{Shelf2_1.oos_data}\n"
+            data4=f"Shelf2_2 status: Wrong object :{Shelf2_2.wrong_object_data} -- SOOS:{Shelf2_2.soos_data} -- OOS:{Shelf2_2.oos_data}\n"
+            data5=f"Shelf3_1 status: Wrong object :{Shelf3_1.wrong_object_data} -- SOOS:{Shelf3_1.soos_data} -- OOS:{Shelf3_1.oos_data}\n"
+            data6=f"Shelf3_2 status: Wrong object :{Shelf3_2.wrong_object_data} -- SOOS:{Shelf3_2.soos_data} -- OOS:{Shelf3_2.oos_data}\n"
+            data7=f"Shelf4_1 status: Wrong object :{Shelf4_1.wrong_object_data} -- SOOS:{Shelf4_1.soos_data} -- OOS:{Shelf4_1.oos_data}\n"
+            data8=f"Shelf4_2 status: Wrong object :{Shelf4_2.wrong_object_data} -- SOOS:{Shelf4_2.soos_data} -- OOS:{Shelf4_2.oos_data}\n"
+            message=message+data+data2+data3+data4+data5+data6+data7+data8
+            now=datetime.now()
+            day=now.day
+            month=now.month
+            year=now.year
+            hour=now.hour
+            minute=now.minute
+            second=now.second
+            message=message+f"date: {day}/{month}/{year} time: {hour}:{minute}:{second} \n"
+            gui.publish(gui.topic,message)
+            time.sleep(2)
+            pass
+
 
 t1=threading.Thread(target=Cam1,daemon=True)
 t2=threading.Thread(target=Cam2,daemon=True)
 t3=threading.Thread(target=Cam3,daemon=True)
 t4=threading.Thread(target=Cam4,daemon=True)
+t5=threading.Thread(target=Sending,daemon=True)
  
 
 t1.start()
 t2.start()
 t3.start()
 t4.start()
-
+t5.start()
 
 t1.join()
 t2.join()
 t3.join()
 t4.join()
+t5.join()
 
 
 
