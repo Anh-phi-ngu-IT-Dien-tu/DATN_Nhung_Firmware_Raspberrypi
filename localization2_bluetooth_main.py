@@ -29,14 +29,14 @@ mcu = MyMCU("/dev/ttyUSB0", 115200)
 mcu.start()
 
 # Noise parameters
-Q = [0.12, 0.12]
-R = [0.02, np.deg2rad(1)]
+Q = [0.8, 0.8]
+R = [0.01, np.deg2rad(1)]
 
 robot = Localization(min_range=0, max_range=2000, point_dist_threshold=12, min_cluster_size=6, max_cluster_size=25,
                      avg_angles_lower_bound=np.deg2rad(120), avg_angles_upper_bound=np.deg2rad(160),
                      std_angles_threshold=np.deg2rad(6), min_radius=42, max_radius=47, Q=Q, R=R, maha_threshold=5.991,
-                     linear_vel_max=10, turn_vel_max=5, waypoint_range=20, kp_dist=1, kp_heading=1,
-                     waypoint_min_distance=50)
+                     linear_vel_max=10, turn_vel_max=5, waypoint_range=50, kp_dist=1, kp_heading=1,
+                     waypoint_min_distance=150)
 
 robot.load_landmarks()
 
@@ -56,3 +56,4 @@ except KeyboardInterrupt:
     lidar.stop()
     mcu.stop()
     robot.save_waypoints()
+    print(robot.mean)

@@ -23,7 +23,7 @@ robot = Localization(min_range=0, max_range=2000, point_dist_threshold=12, min_c
                      avg_angles_lower_bound=np.deg2rad(120), avg_angles_upper_bound=np.deg2rad(160),
                      std_angles_threshold=np.deg2rad(6), min_radius=42, max_radius=47, Q=Q, R=R, maha_threshold=5.991,
                      linear_vel_max=50, turn_vel_max=np.deg2rad(30), waypoint_range=50, kp_dist=1, kp_heading=1,
-                     waypoint_min_distance=25)
+                     waypoint_min_distance=150)
 
 robot.load_landmarks()
 robot.load_waypoints()
