@@ -2,18 +2,18 @@
     "Shelf": 1,
     "Sub shelf": 1,
     "Product": [
-        "Chinsu",
-        "ChocoPie",
-        "D.Thanh"
+        "D.Thanh",
+        "Heineken",
+        "Redbull"
     ],
     "From": [
-        1000.0,
-        -1700.0,
-        -1.7
+        800.0,
+        -300.0,
+        -0.3
     ],
     "To": [
-        1300.0,
-        -1500.0,
-        -1.3
+        1700.0,
+        300.0,
+        0.3
     ]
 }

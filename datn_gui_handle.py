@@ -8,6 +8,7 @@ import os
 import json
 import shutil
 import time
+import ast
 
 
 class WorkerThread(QThread):
@@ -57,17 +58,37 @@ class gui_handling(Ui_MainWindow):
         self.worker = WorkerThread()
 
 
-        #shelf
+        #path
 
         self.path = './shelves_info'
+        self.status_path='./shelves_status'
+        self.temp_path='./shelves_logic'
 
         
         if not os.path.exists(self.path):
             os.mkdir(self.path)
-        self.addproductcheck=0
-
+        if not os.path.exists(self.temp_path):
+            os.mkdir(self.temp_path)
+        else:
+            shutil.rmtree(self.temp_path)
+            os.mkdir(self.temp_path)
+        if not os.path.exists(self.status_path):
+            os.mkdir(self.status_path)
+        else:
+            shutil.rmtree(self.status_path)
+            os.mkdir(self.status_path)
         
+        for i in range(1,5):
+            with open(self.temp_path+f"/shelf{i}_logic_watch.json","w") as outfile:
+                data={
+                    "wrong_object_logic":0,
+                    "soos_object_logic":0,
+                    "oos_status_logic":0
+                }
+                json.dump(data,outfile,indent=4)
 
+        #shelf
+        self.addproductcheck=0
         self.productComboBox.addItems(['247', 'Chinsu', 'ChocoPie', 'D.Thanh', 'Heineken', 'Oreo', 'Pepsi-xanh', 'Redbull', 'Revive-chanh', 'Simply', 'TH true Milk', 'Tea Plus', 'Vinamilk', 'coca', 'coca-chai', 'custas', 'fanta-cam', 'khongdo', 'number1', 'sprite-lon', 'sting', 'vinhhao'])
         self.addProductPushButton.clicked.connect(self.addProductButtonHandle) 
         self.deleteProductPushButton.clicked.connect(self.deleteProductButtonHandle)      
@@ -79,6 +100,7 @@ class gui_handling(Ui_MainWindow):
 
         #watch shelf
         self.shelf_existed={0}
+        self.watching_shelf=0
         for root, dirs, files in os.walk(self.path):
             for file in files:
                 if file.endswith(".json"):
@@ -89,8 +111,15 @@ class gui_handling(Ui_MainWindow):
                         if shelf_num not in self.shelf_existed:
                             self.shelf_existed.add(shelf_num)
                             self.shelfComboBox.addItem(f"Shelf {shelf_num}")
+        
+        
+     
+    
 
         self.shelfComboBox.currentIndexChanged.connect(self.shelfComboBoxHandle)
+        self.dealOOSPushButton.clicked.connect(self.dealOOSButtonHandle)
+        self.wrongObjectPushButton.clicked.connect(self.dealWrongButtonHandle)
+        self.SOOSPushButton.clicked.connect(self.dealSOOSButtonHandle)
         self.subShelfLineEdit.setReadOnly(True)
         self.subShelfLineEdit_2.setReadOnly(True)
         self.xFromDoubleSpinBox.setReadOnly(True)
@@ -99,7 +128,13 @@ class gui_handling(Ui_MainWindow):
         self.xToDoubleSpinBox.setReadOnly(True)
         self.yToDoubleSpinBox.setReadOnly(True)
         self.thetaToDoubleSpinBox.setReadOnly(True)
-
+        self.wrongObjectCheckBox.setEnabled(False)
+        self.SOOSObjectCheckBox.setEnabled(False)
+        self.OOSStatusCheckBox.setEnabled(False)
+        self.wrongObjectTextBrowser.setPlainText("Sub shelf 1: No object\nSub shelf 2: No object")
+        self.SOOSObjectTextBrowser.setPlainText("Sub shelf 1: No object\nSub shelf 2: No object")
+        self.OOSStatusTextBrowser.setPlainText("Sub shelf 1: No OOS\nSub shelf 2: No OOS")
+        self.shelfComboBoxHandle()
 
     def show(self):
         self.main_window.show()
@@ -184,6 +219,110 @@ class gui_handling(Ui_MainWindow):
         else:
             message=self.gui_mqtt.get_message()
             self.debug(message)
+            spilt_message=message.split('\n')
+            if spilt_message[0]=='stop':
+                for i in range(1,5):
+                    with open(self.temp_path+f"/shelf{i}_logic_watch.json","w") as outfile:
+                        data={
+                            "wrong_object_logic":0,
+                            "soos_object_logic":0,
+                            "oos_status_logic":0
+                        }
+                        json.dump(data,outfile,indent=4)
+                self.SOOSObjectCheckBox.setChecked(False)
+                self.OOSStatusCheckBox.setChecked(False)
+                self.wrongObjectCheckBox.setChecked(False)
+                return
+            for deal_message in spilt_message:
+                try:
+                    if deal_message.startswith("Shelf"):
+                        temp_message=deal_message.split('/')
+                        index_part=temp_message[0].replace("Shelf","")
+                        index=index_part.split("_")
+                        x=int(index[0])
+                        y=int(index[1])
+                        wrong_object_text=temp_message[1].replace("Wrong object :","")
+                        soos_text=temp_message[2].replace("-- SOOS:","")
+                        oos_text=temp_message[3].replace("-- OOS:","")
+                        file=f"shelf{x}_{y}.txt"
+                        full_status_file=f"{self.status_path}/{file}"
+                        with open(full_status_file, "w", encoding="utf-8") as f:
+                            f.write(wrong_object_text+'\n')
+                            f.write(soos_text+'\n')
+                            f.write(oos_text+'\n')
+                except:
+                    print("error in handling received frame")
+                    return
+            wrong_message=''
+            soos_message=''
+            oos_message=''
+            logic_data=None
+            with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","r") as readfile:
+                logic_data=json.load(readfile)
+            for i in range(1,3):
+                wrong_message=wrong_message+f"\nSub shelf {i}: "
+                soos_message=soos_message+f"\nSub shelf {i}: "
+                oos_message=oos_message+f"\nSub shelf {i}: "
+                file=f"shelf{self.watching_shelf}_{i}.txt"
+                file_path=f"{self.status_path}/{file}"
+                if not os.path.exists(file_path):
+                    print(f"shelf{self.watching_shelf}")
+                    print("file doesn't exist")
+                    continue
+                with open(file_path, "r", encoding="utf-8") as f:
+                    lines = f.readlines()
+                temp=[]
+                for line in lines:                
+                    line=line.replace("{","")
+                    line=line.replace("}","")
+                    line=line.replace('[',"")
+                    line=line.replace(']',"")
+                    line=line.replace(' ','')
+                    line=line.replace('\'','')
+                    
+                    temp.append(line.strip())
+                    
+                lines=temp
+                wrong_object_result,soos_result,oos_result=lines
+                if logic_data["wrong_object_logic"]==0:
+                    if wrong_object_result!='':
+                        data=wrong_object_result.split(',')
+                        for temp in data: 
+                            temp=temp.replace("object:","")
+                            if temp!='':
+                                wrong_message=wrong_message+temp+',' 
+                        
+                    else:
+                        wrong_message=wrong_message+"No object"
+                else:
+                    wrong_message=wrong_message+"Fixed"
+                if logic_data["soos_object_logic"]==0:
+                    if soos_result!='':
+                        data=soos_result.split(',')
+                        if data[-1]!=':0':
+                            for temp in data[:-1]:
+                                split_temp=temp.split(':')
+                                if split_temp[1]=='1':
+                                    soos_message=soos_message+split_temp[0]+','
+                        else:
+                            soos_message=soos_message+"No object"
+                else:
+                    soos_message=soos_message+"Fixed"
+                if logic_data["oos_status_logic"]==0:
+                    if oos_result!='':
+                        data=oos_result.split(',')
+                        if data[-1]!=':0':
+                            oos_message=oos_message+"OOS exist"
+                        else:
+                            oos_message=oos_message+"No OOS"
+                else:
+                    oos_message=oos_message+"Fixed"
+
+            self.wrongObjectTextBrowser.setPlainText(wrong_message)
+            self.SOOSObjectTextBrowser.setPlainText(soos_message)
+            self.OOSStatusTextBrowser.setPlainText(oos_message)
+
+
             
 
 #shelf 
@@ -368,6 +507,7 @@ class gui_handling(Ui_MainWindow):
             return
         shelf_text_temp=shelf_text.split(' ')
         shelf_num_in_box=int(shelf_text_temp[1])
+        self.watching_shelf=shelf_num_in_box
         for root, dirs, files in os.walk(self.path):
             for file in files:
                 if file.endswith(".json"):
@@ -394,13 +534,46 @@ class gui_handling(Ui_MainWindow):
                                 self.xToDoubleSpinBox.setValue(coor_to[0])
                                 self.yToDoubleSpinBox.setValue(coor_to[1])
                                 self.thetaToDoubleSpinBox.setValue(coor_to[2])
-
-
                         else:
                             continue
-                        
 
         
+    def dealOOSButtonHandle(self):    
+        with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","r") as readfile:
+            data=json.load(readfile)
+        if data["oos_status_logic"]==0:
+            self.OOSStatusCheckBox.setChecked(True)
+            data["oos_status_logic"]=1
+        else:
+            self.OOSStatusCheckBox.setChecked(False)
+            data["oos_status_logic"]=0
+        with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","w") as outfile:
+            json.dump(data,outfile)
+
+    def dealWrongButtonHandle(self):
+        with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","r") as readfile:
+            data=json.load(readfile)
+        if data["wrong_object_logic"]==0:
+            self.wrongObjectCheckBox.setChecked(True)
+            data["wrong_object_logic"]=1
+        else:
+            self.wrongObjectCheckBox.setChecked(False)
+            data["wrong_object_logic"]=0
+        with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","w") as outfile:
+            json.dump(data,outfile)
+    
+    def dealSOOSButtonHandle(self):
+        with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","r") as readfile:
+            data=json.load(readfile)
+
+        if data["soos_object_logic"]==0:
+            self.SOOSObjectCheckBox.setChecked(True)
+            data["soos_object_logic"]=1
+        else:
+            self.SOOSObjectCheckBox.setChecked(False)
+            data["soos_object_logic"]=0
+        with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","w") as outfile:
+            json.dump(data,outfile)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

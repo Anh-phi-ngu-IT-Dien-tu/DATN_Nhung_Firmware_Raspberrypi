@@ -3,13 +3,8 @@ import json
 
 
 
-path = './shelves_info'
-if not os.path.exists(path):
-    os.mkdir(path)
 
+status_path='./shelves_status'
+file='g.json'
+print(os.path.join(status_path, file))
 
-for root, dirs, files in os.walk(path):
-    for file in files:
-        if file.endswith(".json"):
-            a=file.split('.')
-            print(a)

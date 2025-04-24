@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1400</width>
-    <height>674</height>
+    <height>816</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -624,7 +624,7 @@
       <x>810</x>
       <y>50</y>
       <width>581</width>
-      <height>311</height>
+      <height>711</height>
      </rect>
     </property>
     <property name="font">
@@ -877,13 +877,188 @@
       </property>
      </widget>
     </widget>
+    <widget class="QGroupBox" name="shelfStatusGroupBox">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>300</y>
+       <width>561</width>
+       <height>391</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Shelf status</string>
+     </property>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Wrong object</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_15">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>180</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>SOOS object</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_20">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>270</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>OOS status</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="dealOOSPushButton">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>350</y>
+        <width>151</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Deal with OOS</string>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="wrongObjectPushButton">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>350</y>
+        <width>201</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Deal with wrong object</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="SOOSPushButton">
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>350</y>
+        <width>131</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Deal with SOOS</string>
+      </property>
+     </widget>
+     <widget class="QTextBrowser" name="wrongObjectTextBrowser">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>40</y>
+        <width>421</width>
+        <height>71</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTextBrowser" name="SOOSObjectTextBrowser">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>150</y>
+        <width>421</width>
+        <height>71</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTextBrowser" name="OOSStatusTextBrowser">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>250</y>
+        <width>421</width>
+        <height>71</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="wrongObjectCheckBox">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>70</y>
+        <width>41</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="SOOSObjectCheckBox">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>210</y>
+        <width>41</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="OOSStatusCheckBox">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>300</y>
+        <width>41</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="noteGroupBox">
     <property name="geometry">
      <rect>
-      <x>810</x>
-      <y>360</y>
-      <width>581</width>
+      <x>0</x>
+      <y>630</y>
+      <width>801</width>
       <height>151</height>
      </rect>
     </property>
@@ -900,7 +1075,7 @@
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>561</width>
+       <width>781</width>
        <height>111</height>
       </rect>
      </property>
