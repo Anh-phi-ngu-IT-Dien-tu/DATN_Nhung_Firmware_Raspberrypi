@@ -12,14 +12,8 @@ gui.start_mqtt()
 
 message=''
 
-for root, dirs, files in os.walk(path):
-    for file in files:
-        if file.endswith(".json"):
-            full_path = os.path.join(root, file)
-            with open(full_path,"r") as readfile:
-                data = json.load(readfile)
-            message=message+f'{file} result: {data}\n'
-
+message='stop\n'
+            
 now=datetime.now()
 day=now.day
 month=now.month
@@ -29,5 +23,4 @@ minute=now.minute
 second=now.second
 message=message+f"date: {day}/{month}/{year} time: {hour}:{minute}:{second} \n"
 gui.publish(gui.topic,message)
-time.sleep(5)
 gui.stop_mqtt()

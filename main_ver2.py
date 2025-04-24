@@ -20,7 +20,7 @@ elif os.path.exists(path):
     os.mkdir(path)
 
 Shelf1_1=Shelf(["coca"],1,1,"shelf1_1",path)
-Shelf1_2=Shelf([],1,2,"shelf1_2",path)
+Shelf1_2=Shelf([""],1,2,"shelf1_2",path)
 
 Shelf2_1=Shelf([],2,1,"shelf2_1",path)
 Shelf2_2=Shelf([],2,2,"shelf2_2",path)
@@ -166,7 +166,7 @@ def Cam1():
 
             print_out=f"{Robot_Pos.message} Shelf {allow_model}"
             below_cam.show_result(print_out)
-            if cv2.waitKey(1)==ord('q') or break_thread==True:
+            if cv2.waitKey(25)==ord('q') or break_thread==True:
                 break_thread=True
                 Shelf1_1.write_data_to_json()
                 Shelf2_1.write_data_to_json()
@@ -204,7 +204,7 @@ def Cam2():
 
             print_out=f"{Robot_Pos.message} Shelf {allow_model2}"
             above_cam.show_result(print_out)
-            if cv2.waitKey(1)==ord('q') or break_thread==True:
+            if cv2.waitKey(25)==ord('q') or break_thread==True:
                 break_thread=True
                 Shelf1_2.write_data_to_json()
                 Shelf2_2.write_data_to_json()
@@ -242,7 +242,7 @@ def Cam3():
 
             print_out = f"{Robot_Pos.message} Shelf {allow_model3}"
             above_cam2.show_result(print_out)
-            if cv2.waitKey(1) == ord('q') or break_thread==True:
+            if cv2.waitKey(25) == ord('q') or break_thread==True:
                 break_thread = True
                 Shelf3_2.write_data_to_json()
                 Shelf4_2.write_data_to_json()
@@ -280,7 +280,7 @@ def Cam4():
 
             print_out = f"{Robot_Pos.message} Shelf {allow_model4}"
             below_cam2.show_result(print_out)
-            if cv2.waitKey(1) == ord('q') or break_thread:
+            if cv2.waitKey(25) == ord('q') or break_thread:
                 break_thread = True
                 Shelf3_1.write_data_to_json()
                 Shelf4_1.write_data_to_json()
@@ -294,17 +294,17 @@ def Cam4():
 def Sending():
     global allow_model,allow_model2,allow_model3,allow_model4
     message=''
-    while True:
+    while break_thread==False:
         message=''
         if allow_model!=0 or allow_model2!=0 or allow_model3!=0 or allow_model4!=0:
-            data=f"Shelf1_1 status: Wrong object :{Shelf1_1.wrong_object_data} -- SOOS:{Shelf1_1.soos_data} -- OOS:{Shelf1_1.oos_data}\n"
-            data2=f"Shelf1_2 status: Wrong object :{Shelf1_2.wrong_object_data} -- SOOS:{Shelf1_2.soos_data} -- OOS:{Shelf1_2.oos_data}\n"
-            data3=f"Shelf2_1 status: Wrong object :{Shelf2_1.wrong_object_data} -- SOOS:{Shelf2_1.soos_data} -- OOS:{Shelf2_1.oos_data}\n"
-            data4=f"Shelf2_2 status: Wrong object :{Shelf2_2.wrong_object_data} -- SOOS:{Shelf2_2.soos_data} -- OOS:{Shelf2_2.oos_data}\n"
-            data5=f"Shelf3_1 status: Wrong object :{Shelf3_1.wrong_object_data} -- SOOS:{Shelf3_1.soos_data} -- OOS:{Shelf3_1.oos_data}\n"
-            data6=f"Shelf3_2 status: Wrong object :{Shelf3_2.wrong_object_data} -- SOOS:{Shelf3_2.soos_data} -- OOS:{Shelf3_2.oos_data}\n"
-            data7=f"Shelf4_1 status: Wrong object :{Shelf4_1.wrong_object_data} -- SOOS:{Shelf4_1.soos_data} -- OOS:{Shelf4_1.oos_data}\n"
-            data8=f"Shelf4_2 status: Wrong object :{Shelf4_2.wrong_object_data} -- SOOS:{Shelf4_2.soos_data} -- OOS:{Shelf4_2.oos_data}\n"
+            data= f"Shelf1_1/Wrong object :{Shelf1_1.wrong_object_data}/-- SOOS:{Shelf1_1.soos_data}/-- OOS:{Shelf1_1.oos_data}\n"
+            data2=f"Shelf1_2/Wrong object :{Shelf1_2.wrong_object_data}/-- SOOS:{Shelf1_2.soos_data}/-- OOS:{Shelf1_2.oos_data}\n"
+            data3=f"Shelf2_1/Wrong object :{Shelf2_1.wrong_object_data}/-- SOOS:{Shelf2_1.soos_data}/-- OOS:{Shelf2_1.oos_data}\n"
+            data4=f"Shelf2_2/Wrong object :{Shelf2_2.wrong_object_data}/-- SOOS:{Shelf2_2.soos_data}/-- OOS:{Shelf2_2.oos_data}\n"
+            data5=f"Shelf3_1/Wrong object :{Shelf3_1.wrong_object_data}/-- SOOS:{Shelf3_1.soos_data}/-- OOS:{Shelf3_1.oos_data}\n"
+            data6=f"Shelf3_2/Wrong object :{Shelf3_2.wrong_object_data}/-- SOOS:{Shelf3_2.soos_data}/-- OOS:{Shelf3_2.oos_data}\n"
+            data7=f"Shelf4_1/Wrong object :{Shelf4_1.wrong_object_data}/-- SOOS:{Shelf4_1.soos_data}/-- OOS:{Shelf4_1.oos_data}\n"
+            data8=f"Shelf4_2/Wrong object :{Shelf4_2.wrong_object_data}/-- SOOS:{Shelf4_2.soos_data}/-- OOS:{Shelf4_2.oos_data}\n"
             message=message+data+data2+data3+data4+data5+data6+data7+data8
             now=datetime.now()
             day=now.day
@@ -313,10 +313,11 @@ def Sending():
             hour=now.hour
             minute=now.minute
             second=now.second
-            message=message+f"date: {day}/{month}/{year} time: {hour}:{minute}:{second} \n"
+            message=message+f"date: {day}/{month}/{year} time: {hour}:{minute}:{second}\n"
             gui.publish(gui.topic,message)
-            time.sleep(2)
+            
             pass
+        time.sleep(2)
 
 
 t1=threading.Thread(target=Cam1,daemon=True)
@@ -343,15 +344,7 @@ t5.join()
 cv2.destroyAllWindows()
 Robot_Pos.stop_mqtt()
 
-message=''
-
-for root, dirs, files in os.walk(path):
-    for file in files:
-        if file.endswith(".json"):
-            full_path = os.path.join(root, file)
-            with open(full_path,"r") as readfile:
-                data = json.load(readfile)
-            message=message+f'{file} result: {data}\n'
+message='stop\n'
             
 now=datetime.now()
 day=now.day
