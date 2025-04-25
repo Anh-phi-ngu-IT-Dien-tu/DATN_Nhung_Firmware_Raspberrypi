@@ -21,8 +21,8 @@ class WorkerThread(QThread):
     def run(self):
         count = 0
         while self._running :
-            time.sleep(0.5)
-            count+=0.5
+            time.sleep(0.1)
+            count+=0.1
             self.progress.emit(count)
 
     def stop(self):
@@ -56,7 +56,9 @@ class gui_handling(Ui_MainWindow):
         self.stopMqttPushButton.setEnabled(False)
         self.sendSettingPushButton.setEnabled(False)
         self.worker = WorkerThread()
-
+        self.read_worker=WorkerThread()
+        self.logic_worker=WorkerThread()
+        
 
         #path
 
@@ -114,12 +116,12 @@ class gui_handling(Ui_MainWindow):
         
         
      
-    
+
 
         self.shelfComboBox.currentIndexChanged.connect(self.shelfComboBoxHandle)
-        self.dealOOSPushButton.clicked.connect(self.dealOOSButtonHandle)
-        self.wrongObjectPushButton.clicked.connect(self.dealWrongButtonHandle)
-        self.SOOSPushButton.clicked.connect(self.dealSOOSButtonHandle)
+        # self.dealOOSPushButton.clicked.connect(self.dealOOSButtonHandle)
+        # self.wrongObjectPushButton.clicked.connect(self.dealWrongButtonHandle)
+        # self.SOOSPushButton.clicked.connect(self.dealSOOSButtonHandle)
         self.subShelfLineEdit.setReadOnly(True)
         self.subShelfLineEdit_2.setReadOnly(True)
         self.xFromDoubleSpinBox.setReadOnly(True)
@@ -200,18 +202,21 @@ class gui_handling(Ui_MainWindow):
         msg.setWindowTitle("MQTT warning")
         msg.setText("MQTT has sent the setting")
         msg.setIcon(QMessageBox.Warning)
-
         x=msg.exec_()
 
     def start_thread(self):
-        if not self.worker.isRunning():
+        if not self.worker.isRunning() and not self.read_worker.isRunning():
             self.worker = WorkerThread()  # tạo mới nếu đã stop trước đó
             self.worker.progress.connect(self.waitingDataThread)
+            self.read_worker.progress.connect(self.reading_data_thread)
             self.worker.start()
+            self.read_worker.start()
+
 
     def stop_thread(self):
-        if self.worker.isRunning():
+        if self.worker.isRunning() and self.read_worker.isRunning():
             self.worker.stop()
+            self.read_worker.stop()
 
     def waitingDataThread(self):
         if self.gui_mqtt.message==None:
@@ -253,77 +258,72 @@ class gui_handling(Ui_MainWindow):
                 except:
                     print("error in handling received frame")
                     return
-            wrong_message=''
-            soos_message=''
-            oos_message=''
-            logic_data=None
-            with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","r") as readfile:
-                logic_data=json.load(readfile)
-            for i in range(1,3):
-                wrong_message=wrong_message+f"\nSub shelf {i}: "
-                soos_message=soos_message+f"\nSub shelf {i}: "
-                oos_message=oos_message+f"\nSub shelf {i}: "
-                file=f"shelf{self.watching_shelf}_{i}.txt"
-                file_path=f"{self.status_path}/{file}"
-                if not os.path.exists(file_path):
-                    print(f"shelf{self.watching_shelf}")
-                    print("file doesn't exist")
-                    continue
-                with open(file_path, "r", encoding="utf-8") as f:
-                    lines = f.readlines()
-                temp=[]
-                for line in lines:                
-                    line=line.replace("{","")
-                    line=line.replace("}","")
-                    line=line.replace('[',"")
-                    line=line.replace(']',"")
-                    line=line.replace(' ','')
-                    line=line.replace('\'','')
-                    
-                    temp.append(line.strip())
-                    
-                lines=temp
-                wrong_object_result,soos_result,oos_result=lines
-                if logic_data["wrong_object_logic"]==0:
-                    if wrong_object_result!='':
-                        data=wrong_object_result.split(',')
-                        for temp in data: 
-                            temp=temp.replace("object:","")
-                            if temp!='':
-                                wrong_message=wrong_message+temp+',' 
-                        
-                    else:
-                        wrong_message=wrong_message+"No object"
-                else:
-                    wrong_message=wrong_message+"Fixed"
-                if logic_data["soos_object_logic"]==0:
-                    if soos_result!='':
-                        data=soos_result.split(',')
-                        if data[-1]!=':0':
-                            for temp in data[:-1]:
-                                split_temp=temp.split(':')
-                                if split_temp[1]=='1':
-                                    soos_message=soos_message+split_temp[0]+','
-                        else:
-                            soos_message=soos_message+"No object"
-                else:
-                    soos_message=soos_message+"Fixed"
-                if logic_data["oos_status_logic"]==0:
-                    if oos_result!='':
-                        data=oos_result.split(',')
-                        if data[-1]!=':0':
-                            oos_message=oos_message+"OOS exist"
-                        else:
-                            oos_message=oos_message+"No OOS"
-                else:
-                    oos_message=oos_message+"Fixed"
 
-            self.wrongObjectTextBrowser.setPlainText(wrong_message)
-            self.SOOSObjectTextBrowser.setPlainText(soos_message)
-            self.OOSStatusTextBrowser.setPlainText(oos_message)
-
-
+            #read data 
             
+    def reading_data_thread(self):
+        wrong_message=''
+        soos_message=''
+        oos_message=''
+
+        for i in range(1,3):
+            wrong_message=wrong_message+f"\nSub shelf {i}: "
+            soos_message=soos_message+f"\nSub shelf {i}: "
+            oos_message=oos_message+f"\nSub shelf {i}: "
+            file=f"shelf{self.watching_shelf}_{i}.txt"
+            file_path=f"{self.status_path}/{file}"
+            if not os.path.exists(file_path):
+                print(f"shelf{self.watching_shelf}")
+                print("file doesn't exist")
+                continue
+            with open(file_path, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+            temp=[]
+            for line in lines:                
+                line=line.replace("{","")
+                line=line.replace("}","")
+                line=line.replace('[',"")
+                line=line.replace(']',"")
+                line=line.replace(' ','')
+                line=line.replace('\'','')
+                
+                temp.append(line.strip())
+                
+            lines=temp
+            wrong_object_result,soos_result,oos_result=lines
+            if wrong_object_result!='':
+                data=wrong_object_result.split(',')
+                for temp in data: 
+                    temp=temp.replace("object:","")
+                    if temp!='':
+                        wrong_message=wrong_message+temp+',' 
+            else:
+                wrong_message=wrong_message+"No object"
+            if soos_result!='':
+                data=soos_result.split(',')
+                if data[-1]!=':0':
+                    for temp in data[:-1]:
+                        split_temp=temp.split(':')
+                        if split_temp[1]=='1':
+                            soos_message=soos_message+split_temp[0]+','
+                else:
+                    soos_message=soos_message+"No object"
+            else:
+                pass     
+            if oos_result!='':
+                data=oos_result.split(',')
+                if data[-1]!=':0':
+
+                    oos_message=oos_message+"OOS exist"
+                else:
+                    oos_message=oos_message+"No OOS"
+
+            else:
+                pass
+            
+        self.wrongObjectTextBrowser.setPlainText(wrong_message)
+        self.SOOSObjectTextBrowser.setPlainText(soos_message)
+        self.OOSStatusTextBrowser.setPlainText(oos_message)
 
 #shelf 
 
@@ -541,37 +541,25 @@ class gui_handling(Ui_MainWindow):
     def dealOOSButtonHandle(self):    
         with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","r") as readfile:
             data=json.load(readfile)
-        if data["oos_status_logic"]==0:
-            self.OOSStatusCheckBox.setChecked(True)
             data["oos_status_logic"]=1
-        else:
-            self.OOSStatusCheckBox.setChecked(False)
-            data["oos_status_logic"]=0
+
         with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","w") as outfile:
             json.dump(data,outfile)
+
+
 
     def dealWrongButtonHandle(self):
         with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","r") as readfile:
             data=json.load(readfile)
-        if data["wrong_object_logic"]==0:
-            self.wrongObjectCheckBox.setChecked(True)
-            data["wrong_object_logic"]=1
-        else:
-            self.wrongObjectCheckBox.setChecked(False)
-            data["wrong_object_logic"]=0
+        data["wrong_object_logic"]=1
         with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","w") as outfile:
             json.dump(data,outfile)
+            
     
     def dealSOOSButtonHandle(self):
         with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","r") as readfile:
             data=json.load(readfile)
-
-        if data["soos_object_logic"]==0:
-            self.SOOSObjectCheckBox.setChecked(True)
-            data["soos_object_logic"]=1
-        else:
-            self.SOOSObjectCheckBox.setChecked(False)
-            data["soos_object_logic"]=0
+        data["soos_object_logic"]=1
         with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","w") as outfile:
             json.dump(data,outfile)
 
