@@ -80,10 +80,10 @@ robot_topic=a[-1]
 Robot_Pos=Robot_MQTT_Position(host="broker.emqx.io",topic=robot_topic)
 Robot_Pos.start_mqtt()
 
-above_cam=Vision_ESP32("http://192.168.137.235/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Above_detection","Above_Out_of_stock")
-below_cam=Vision_ESP32("http://192.168.137.138/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Below_detection","Below_Out_of_stock")
-above_cam2=Vision_ESP32("http://192.168.137.245/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Above_detection_2","Above_Out_of_stock_2")
-below_cam2=Vision_ESP32("http://192.168.137.26/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Below_detection_2","Below_Out_of_stock_2")
+above_cam=Vision_ESP32("http://192.168.137.235/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Shelf1,2_2 detection","Shelf1,2_2 out_of_stock")
+below_cam=Vision_ESP32("http://192.168.137.138/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Shelf1,2_1 detection","Shelf1,2_1 out_of_stock")
+above_cam2=Vision_ESP32("http://192.168.137.245/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Shelf3,4_2 detection","Shelf3,4_2 out_of_stock")
+below_cam2=Vision_ESP32("http://192.168.137.26/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Shelf3,4_1 detection","Shelf3,4_1 out_of_stock")
 
 
 
