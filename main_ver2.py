@@ -319,6 +319,13 @@ def Sending():
             pass
         time.sleep(2)
 
+def Receiving():
+    global allow_model,allow_model2,allow_model3,allow_model4
+    received_message=''
+    while break_thread==False:
+        if gui.message!=None:
+            received_message=gui.get_message()
+            
 
 t1=threading.Thread(target=Cam1,daemon=True)
 t2=threading.Thread(target=Cam2,daemon=True)
