@@ -74,10 +74,12 @@ for b in a:
     except:
         pass
 
-gui.publish(gui.topic,a[-1])
-robot_topic=a[-1]
+gui_receive_topic=a[-1]
+gui.publish(gui.topic,f"Yolo ready\n{gui_receive_topic}")
 
-Robot_Pos=Robot_MQTT_Position(host="broker.emqx.io",topic=robot_topic)
+gui_receive=Robot_MQTT_Position(host="broker.emqx.io",topic=gui_receive_topic,use_coordinate=False)
+
+Robot_Pos=Robot_MQTT_Position(host="broker.emqx.io",topic="Robot")
 Robot_Pos.start_mqtt()
 
 above_cam=Vision_ESP32("http://192.168.137.235/capture","stockv19.pt","oosv12.pt",0.75,0.6,"Shelf1,2_2 detection","Shelf1,2_2 out_of_stock")
@@ -138,6 +140,16 @@ def Shelf_Pos_Compare4():
     else:
         allow_model4 = 0
 
+def Shelf_Reset_Data(index=1):
+    for i in range(1,3):
+        Shelf1_1.ResetData(index,i)
+        Shelf1_2.ResetData(index,i)
+        Shelf2_1.ResetData(index,i)
+        Shelf2_2.ResetData(index,i)
+        Shelf3_1.ResetData(index,i)
+        Shelf3_2.ResetData(index,i)
+        Shelf4_1.ResetData(index,i)
+        Shelf4_2.ResetData(index,i)
 
 def Cam1():
     global allow_model
@@ -292,39 +304,43 @@ def Cam4():
             pass
 
 def Sending():
-    global allow_model,allow_model2,allow_model3,allow_model4
+    global break_thread
     message=''
     while break_thread==False:
         message=''
-        if allow_model!=0 or allow_model2!=0 or allow_model3!=0 or allow_model4!=0:
-            data= f"Shelf1_1/Wrong object :{Shelf1_1.wrong_object_data}/-- SOOS:{Shelf1_1.soos_data}/-- OOS:{Shelf1_1.oos_data}\n"
-            data2=f"Shelf1_2/Wrong object :{Shelf1_2.wrong_object_data}/-- SOOS:{Shelf1_2.soos_data}/-- OOS:{Shelf1_2.oos_data}\n"
-            data3=f"Shelf2_1/Wrong object :{Shelf2_1.wrong_object_data}/-- SOOS:{Shelf2_1.soos_data}/-- OOS:{Shelf2_1.oos_data}\n"
-            data4=f"Shelf2_2/Wrong object :{Shelf2_2.wrong_object_data}/-- SOOS:{Shelf2_2.soos_data}/-- OOS:{Shelf2_2.oos_data}\n"
-            data5=f"Shelf3_1/Wrong object :{Shelf3_1.wrong_object_data}/-- SOOS:{Shelf3_1.soos_data}/-- OOS:{Shelf3_1.oos_data}\n"
-            data6=f"Shelf3_2/Wrong object :{Shelf3_2.wrong_object_data}/-- SOOS:{Shelf3_2.soos_data}/-- OOS:{Shelf3_2.oos_data}\n"
-            data7=f"Shelf4_1/Wrong object :{Shelf4_1.wrong_object_data}/-- SOOS:{Shelf4_1.soos_data}/-- OOS:{Shelf4_1.oos_data}\n"
-            data8=f"Shelf4_2/Wrong object :{Shelf4_2.wrong_object_data}/-- SOOS:{Shelf4_2.soos_data}/-- OOS:{Shelf4_2.oos_data}\n"
-            message=message+data+data2+data3+data4+data5+data6+data7+data8
-            now=datetime.now()
-            day=now.day
-            month=now.month
-            year=now.year
-            hour=now.hour
-            minute=now.minute
-            second=now.second
-            message=message+f"date: {day}/{month}/{year} time: {hour}:{minute}:{second}\n"
-            gui.publish(gui.topic,message)
-            
-            pass
-        time.sleep(2)
+        data= f"Shelf1_1/Wrong object :{Shelf1_1.wrong_object_data}/-- SOOS:{Shelf1_1.soos_data}/-- OOS:{Shelf1_1.oos_data}\n"
+        data2=f"Shelf1_2/Wrong object :{Shelf1_2.wrong_object_data}/-- SOOS:{Shelf1_2.soos_data}/-- OOS:{Shelf1_2.oos_data}\n"
+        data3=f"Shelf2_1/Wrong object :{Shelf2_1.wrong_object_data}/-- SOOS:{Shelf2_1.soos_data}/-- OOS:{Shelf2_1.oos_data}\n"
+        data4=f"Shelf2_2/Wrong object :{Shelf2_2.wrong_object_data}/-- SOOS:{Shelf2_2.soos_data}/-- OOS:{Shelf2_2.oos_data}\n"
+        data5=f"Shelf3_1/Wrong object :{Shelf3_1.wrong_object_data}/-- SOOS:{Shelf3_1.soos_data}/-- OOS:{Shelf3_1.oos_data}\n"
+        data6=f"Shelf3_2/Wrong object :{Shelf3_2.wrong_object_data}/-- SOOS:{Shelf3_2.soos_data}/-- OOS:{Shelf3_2.oos_data}\n"
+        data7=f"Shelf4_1/Wrong object :{Shelf4_1.wrong_object_data}/-- SOOS:{Shelf4_1.soos_data}/-- OOS:{Shelf4_1.oos_data}\n"
+        data8=f"Shelf4_2/Wrong object :{Shelf4_2.wrong_object_data}/-- SOOS:{Shelf4_2.soos_data}/-- OOS:{Shelf4_2.oos_data}\n"
+        message=message+data+data2+data3+data4+data5+data6+data7+data8
+        now=datetime.now()
+        day=now.day
+        month=now.month
+        year=now.year
+        hour=now.hour
+        minute=now.minute
+        second=now.second
+        message=message+f"date: {day}/{month}/{year} time: {hour}:{minute}:{second}\n"
+        gui.publish(gui.topic,message)
+        time.sleep(1)
 
 def Receiving():
-    global allow_model,allow_model2,allow_model3,allow_model4
+    global break_thread
     received_message=''
     while break_thread==False:
-        if gui.message!=None:
-            received_message=gui.get_message()
+        if gui_receive.message!=None:
+            received_message=gui_receive.get_message()
+            if received_message.startswith("Shelf"):
+                temp=received_message.replace("Shelf","")
+                index=int(temp)
+                Shelf_Reset_Data(index)
+                
+        time.sleep(0.01)              
+            
             
 
 t1=threading.Thread(target=Cam1,daemon=True)
@@ -332,6 +348,7 @@ t2=threading.Thread(target=Cam2,daemon=True)
 t3=threading.Thread(target=Cam3,daemon=True)
 t4=threading.Thread(target=Cam4,daemon=True)
 t5=threading.Thread(target=Sending,daemon=True)
+t6=threading.Thread(target=Receiving,daemon=True)
  
 
 t1.start()
@@ -339,12 +356,14 @@ t2.start()
 t3.start()
 t4.start()
 t5.start()
+t6.start()
 
 t1.join()
 t2.join()
 t3.join()
 t4.join()
 t5.join()
+t6.join()
 
 
 
@@ -363,5 +382,6 @@ second=now.second
 message=message+f"date: {day}/{month}/{year} time: {hour}:{minute}:{second} \n"
 gui.publish(gui.topic,message)
 gui.stop_mqtt()
+gui_receive.stop_mqtt()
                         
                         

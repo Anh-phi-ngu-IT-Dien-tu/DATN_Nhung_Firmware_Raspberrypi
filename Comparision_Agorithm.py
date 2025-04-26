@@ -61,22 +61,16 @@ class Shelf:
             self.seen_data=dict.fromkeys(shelf,0)
             self.write_data_to_json()
 
-    def ResetSOOSData(self,id=1,sub_id=1):
+    def ResetData(self,id=1,sub_id=1):
         if id==self.shelf_id and sub_id==self.shelf_sub_id:
             for object in self.shelf_set:
                 self.soos_data[object]=0
-            self.soos_data
-
-    def ResetOOSData(self,id=1,sub_id=1):
-        if id==self.shelf_id and sub_id==self.shelf_sub_id:
+            self.soos_data[""]=0
             for object in self.shelf_set:
                 self.oos_data[object]=0
             self.oos_data[""]=0
-    
-    def ResetWrongObject(self,id=1,sub_id=1):
-        if id==self.shelf_id and sub_id==self.shelf_sub_id:
             self.wrong_object_data=[]
-
+            
     def shelf_object_comparision(self,id=1,object_dictionary_list=[{"object":'247',"coordinate":np.array([0,0,0,0])}]):
         if id==self.shelf_id:
             for dictionary in object_dictionary_list:
