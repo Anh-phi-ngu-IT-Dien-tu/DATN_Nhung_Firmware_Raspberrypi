@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1400</width>
-    <height>816</height>
+    <height>815</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -597,7 +597,7 @@
     <widget class="QLabel" name="label">
      <property name="geometry">
       <rect>
-       <x>290</x>
+       <x>300</x>
        <y>90</y>
        <width>91</width>
        <height>16</height>
@@ -893,7 +893,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>40</y>
+        <y>60</y>
         <width>101</width>
         <height>16</height>
        </rect>
@@ -928,46 +928,20 @@
        <string>OOS status</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="dealOOSPushButton">
+     <widget class="QPushButton" name="fixShelfPushButton">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>210</x>
         <y>350</y>
         <width>151</width>
         <height>28</height>
        </rect>
       </property>
       <property name="text">
-       <string>Deal with OOS</string>
+       <string>Fixed shelf</string>
       </property>
       <property name="checkable">
        <bool>false</bool>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="wrongObjectPushButton">
-      <property name="geometry">
-       <rect>
-        <x>190</x>
-        <y>350</y>
-        <width>201</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Deal with wrong object</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="SOOSPushButton">
-      <property name="geometry">
-       <rect>
-        <x>400</x>
-        <y>350</y>
-        <width>131</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Deal with SOOS</string>
       </property>
      </widget>
      <widget class="QTextBrowser" name="wrongObjectTextBrowser">
@@ -998,57 +972,6 @@
         <width>421</width>
         <height>71</height>
        </rect>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="wrongObjectCheckBox">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>70</y>
-        <width>41</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
-      </property>
-      <property name="checked">
-       <bool>false</bool>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="SOOSObjectCheckBox">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>210</y>
-        <width>41</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="OOSStatusCheckBox">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>300</y>
-        <width>41</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
       </property>
      </widget>
     </widget>

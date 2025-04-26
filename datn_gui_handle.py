@@ -9,6 +9,7 @@ import json
 import shutil
 import time
 import ast
+import yaml
 
 
 class WorkerThread(QThread):
@@ -34,7 +35,7 @@ class gui_handling(Ui_MainWindow):
         self.main_window=QtWidgets.QMainWindow()
         self.setupUi(self.main_window)
 
-        self.noteTextBrowser.setPlainText("1. The coordinate of every shelves are defined following sub shelf. " \
+        self.noteTextBrowser.setPlainText("1. The coordinate of every shelves are defined following sub shelf 1. " \
         "User should define sub shelf 2 coordinate the same as sub shelf 1\n\n" \
         "2. The coordinate values always follow the rule that \"From\" values are smaller than \"To\" values\n\n" \
         "3. With theta values, keep following the the rule but make sure the range is smaller than pi or else the logic of " \
@@ -46,10 +47,11 @@ class gui_handling(Ui_MainWindow):
         self.mqtt_worker = None
         ### mqttt
         self.gui_mqtt=Robot_MQTT_Position()
+        self.guiToYoloMqtt=Robot_MQTT_Position()
         self.portSpinBox.setValue(1883)
         self.BrokerLineEdit.setText("broker.emqx.io")
         self.GUITopicLineEdit.setText("GUI")
-        self.robotTopicLineEdit.setText("Robot")
+        self.robotTopicLineEdit.setText("Yolo")
         self.mqttConnectPushButton.clicked.connect(self.mqttStartButtonHandle)
         self.stopMqttPushButton.clicked.connect(self.mqttStopButtonHandle)
         self.sendSettingPushButton.clicked.connect(self.mqttSendSettingButtonHandle)
@@ -57,8 +59,6 @@ class gui_handling(Ui_MainWindow):
         self.sendSettingPushButton.setEnabled(False)
         self.worker = WorkerThread()
         self.read_worker=WorkerThread()
-        self.logic_worker=WorkerThread()
-        
 
         #path
 
@@ -69,29 +69,18 @@ class gui_handling(Ui_MainWindow):
         
         if not os.path.exists(self.path):
             os.mkdir(self.path)
-        if not os.path.exists(self.temp_path):
-            os.mkdir(self.temp_path)
-        else:
-            shutil.rmtree(self.temp_path)
-            os.mkdir(self.temp_path)
         if not os.path.exists(self.status_path):
             os.mkdir(self.status_path)
         else:
             shutil.rmtree(self.status_path)
             os.mkdir(self.status_path)
-        
-        for i in range(1,5):
-            with open(self.temp_path+f"/shelf{i}_logic_watch.json","w") as outfile:
-                data={
-                    "wrong_object_logic":0,
-                    "soos_object_logic":0,
-                    "oos_status_logic":0
-                }
-                json.dump(data,outfile,indent=4)
 
         #shelf
         self.addproductcheck=0
-        self.productComboBox.addItems(['247', 'Chinsu', 'ChocoPie', 'D.Thanh', 'Heineken', 'Oreo', 'Pepsi-xanh', 'Redbull', 'Revive-chanh', 'Simply', 'TH true Milk', 'Tea Plus', 'Vinamilk', 'coca', 'coca-chai', 'custas', 'fanta-cam', 'khongdo', 'number1', 'sprite-lon', 'sting', 'vinhhao'])
+        with open('data.yaml', 'r') as file:
+            data_yaml = yaml.safe_load(file)
+        self.class_names = data_yaml['names']
+        self.productComboBox.addItems(self.class_names)
         self.addProductPushButton.clicked.connect(self.addProductButtonHandle) 
         self.deleteProductPushButton.clicked.connect(self.deleteProductButtonHandle)      
         self.resetShelfPushButton.clicked.connect(self.resetShelfButtonHandle)
@@ -119,9 +108,7 @@ class gui_handling(Ui_MainWindow):
 
 
         self.shelfComboBox.currentIndexChanged.connect(self.shelfComboBoxHandle)
-        # self.dealOOSPushButton.clicked.connect(self.dealOOSButtonHandle)
-        # self.wrongObjectPushButton.clicked.connect(self.dealWrongButtonHandle)
-        # self.SOOSPushButton.clicked.connect(self.dealSOOSButtonHandle)
+        self.fixShelfPushButton.clicked.connect(self.fixShelfButtonHandle)
         self.subShelfLineEdit.setReadOnly(True)
         self.subShelfLineEdit_2.setReadOnly(True)
         self.xFromDoubleSpinBox.setReadOnly(True)
@@ -130,9 +117,7 @@ class gui_handling(Ui_MainWindow):
         self.xToDoubleSpinBox.setReadOnly(True)
         self.yToDoubleSpinBox.setReadOnly(True)
         self.thetaToDoubleSpinBox.setReadOnly(True)
-        self.wrongObjectCheckBox.setEnabled(False)
-        self.SOOSObjectCheckBox.setEnabled(False)
-        self.OOSStatusCheckBox.setEnabled(False)
+        self.fixShelfPushButton.setEnabled(False)
         self.wrongObjectTextBrowser.setPlainText("Sub shelf 1: No object\nSub shelf 2: No object")
         self.SOOSObjectTextBrowser.setPlainText("Sub shelf 1: No object\nSub shelf 2: No object")
         self.OOSStatusTextBrowser.setPlainText("Sub shelf 1: No OOS\nSub shelf 2: No OOS")
@@ -153,17 +138,21 @@ class gui_handling(Ui_MainWindow):
         topic=self.GUITopicLineEdit.text()
         self.gui_mqtt.set_up_broker(broker,port,topic)
         self.gui_mqtt.start_mqtt()
+        yolo_topic=self.robotTopicLineEdit.text()
+        self.guiToYoloMqtt.set_up_broker(broker,port,yolo_topic)
+        self.guiToYoloMqtt.start_mqtt()
         msg=QMessageBox()
         msg.setWindowTitle("MQTT warning")
         msg.setText("MQTT has been connected\nBegin waiting for data")
         msg.setIcon(QMessageBox.Information)
 
-       
         self.mqttConnectPushButton.setEnabled(False)
         self.sendSettingPushButton.setEnabled(True)
         self.stopMqttPushButton.setEnabled(True)
         self.BrokerLineEdit.setReadOnly(True)
         self.GUITopicLineEdit.setReadOnly(True)
+        self.robotTopicLineEdit.setReadOnly(True)
+        self.fixShelfPushButton.setEnabled(True)
         self.start_thread()
         x=msg.exec_()
            
@@ -171,6 +160,8 @@ class gui_handling(Ui_MainWindow):
     def mqttStopButtonHandle(self):
         self.gui_mqtt.stop_mqtt()
         self.gui_mqtt.disconnect()
+        self.guiToYoloMqtt.stop_mqtt()
+        self.guiToYoloMqtt.disconnect()
         msg=QMessageBox()
         msg.setWindowTitle("MQTT warning")
         msg.setText("MQTT has been disconnected\nStopping receiving data")
@@ -183,6 +174,8 @@ class gui_handling(Ui_MainWindow):
         self.stopMqttPushButton.setEnabled(False)
         self.BrokerLineEdit.setReadOnly(False)
         self.GUITopicLineEdit.setReadOnly(False)
+        self.robotTopicLineEdit.setReadOnly(False)
+        self.fixShelfPushButton.setEnabled(True)
         self.stop_thread()
     
 
@@ -226,17 +219,6 @@ class gui_handling(Ui_MainWindow):
             self.debug(message)
             spilt_message=message.split('\n')
             if spilt_message[0]=='stop':
-                for i in range(1,5):
-                    with open(self.temp_path+f"/shelf{i}_logic_watch.json","w") as outfile:
-                        data={
-                            "wrong_object_logic":0,
-                            "soos_object_logic":0,
-                            "oos_status_logic":0
-                        }
-                        json.dump(data,outfile,indent=4)
-                self.SOOSObjectCheckBox.setChecked(False)
-                self.OOSStatusCheckBox.setChecked(False)
-                self.wrongObjectCheckBox.setChecked(False)
                 return
             for deal_message in spilt_message:
                 try:
@@ -275,6 +257,9 @@ class gui_handling(Ui_MainWindow):
             if not os.path.exists(file_path):
                 print(f"shelf{self.watching_shelf}")
                 print("file doesn't exist")
+                wrong_message=wrong_message+"No object"
+                soos_message=soos_message+"No object"
+                oos_message=oos_message+"No OOS"
                 continue
             with open(file_path, "r", encoding="utf-8") as f:
                 lines = f.readlines()
@@ -302,14 +287,18 @@ class gui_handling(Ui_MainWindow):
             if soos_result!='':
                 data=soos_result.split(',')
                 if data[-1]!=':0':
+                    state=False
                     for temp in data[:-1]:
                         split_temp=temp.split(':')
                         if split_temp[1]=='1':
                             soos_message=soos_message+split_temp[0]+','
+                            state=True
+                    if state==False:
+                        soos_message=soos_message+'SOOS exist but unknow object'
                 else:
                     soos_message=soos_message+"No object"
             else:
-                pass     
+                soos_message=soos_message+"No object"  
             if oos_result!='':
                 data=oos_result.split(',')
                 if data[-1]!=':0':
@@ -319,7 +308,7 @@ class gui_handling(Ui_MainWindow):
                     oos_message=oos_message+"No OOS"
 
             else:
-                pass
+                oos_message=oos_message+"No OOS"
             
         self.wrongObjectTextBrowser.setPlainText(wrong_message)
         self.SOOSObjectTextBrowser.setPlainText(soos_message)
@@ -343,7 +332,7 @@ class gui_handling(Ui_MainWindow):
         self.subShelfProductLineEdit.del_()
         self.addproductcheck=0
         self.productComboBox.clear()
-        self.productComboBox.addItems(['247', 'Chinsu', 'ChocoPie', 'D.Thanh', 'Heineken', 'Oreo', 'Pepsi-xanh', 'Redbull', 'Revive-chanh', 'Simply', 'TH true Milk', 'Tea Plus', 'Vinamilk', 'coca', 'coca-chai', 'custas', 'fanta-cam', 'khongdo', 'number1', 'sprite-lon', 'sting', 'vinhhao'])
+        self.productComboBox.addItems(self.class_names)
 
     def resetShelfButtonHandle(self):
         shutil.rmtree(self.path) 
@@ -537,32 +526,11 @@ class gui_handling(Ui_MainWindow):
                         else:
                             continue
 
-        
-    def dealOOSButtonHandle(self):    
-        with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","r") as readfile:
-            data=json.load(readfile)
-            data["oos_status_logic"]=1
+    def fixShelfButtonHandle(self):
+        send_message=f"Shelf{self.watching_shelf}"
+        self.guiToYoloMqtt.publish(self.guiToYoloMqtt.topic,send_message)
 
-        with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","w") as outfile:
-            json.dump(data,outfile)
-
-
-
-    def dealWrongButtonHandle(self):
-        with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","r") as readfile:
-            data=json.load(readfile)
-        data["wrong_object_logic"]=1
-        with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","w") as outfile:
-            json.dump(data,outfile)
-            
     
-    def dealSOOSButtonHandle(self):
-        with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","r") as readfile:
-            data=json.load(readfile)
-        data["soos_object_logic"]=1
-        with open(self.temp_path+f"/shelf{self.watching_shelf}_logic_watch.json","w") as outfile:
-            json.dump(data,outfile)
-
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     ui=gui_handling()
