@@ -338,8 +338,7 @@ def Receiving():
                 temp=received_message.replace("Shelf","")
                 index=int(temp)
                 Shelf_Reset_Data(index)
-                
-        time.sleep(0.01)              
+                           
             
             
 
