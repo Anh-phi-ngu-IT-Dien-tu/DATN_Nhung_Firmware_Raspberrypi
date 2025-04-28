@@ -286,13 +286,15 @@ class Vision_ESP32:
                 }
                 self.stock_stage_label_dict.append(temp_dict)
 
-    def show_result(self,message=""):
+    def show_result(self,message="",show_frame_1=True,show_frame_2=True):
         self.out_img= cv2.resize(self.img, (800,600))
         self.out_img2= cv2.resize(self.img2, (800,600))
         cv2.putText(self.out_img,message,(50,50),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),1)
         cv2.putText(self.out_img2,message,(50,50),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),1)
-        cv2.imshow(self.detection_window,self.out_img)
-        cv2.imshow(self.oos_window, self.out_img2)
+        if show_frame_1==True:
+            cv2.imshow(self.detection_window,self.out_img)
+        if show_frame_2==True:
+            cv2.imshow(self.oos_window, self.out_img2)
         pass
 
     

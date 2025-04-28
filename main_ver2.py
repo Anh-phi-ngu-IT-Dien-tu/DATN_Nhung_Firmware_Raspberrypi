@@ -19,8 +19,10 @@ elif os.path.exists(path):
     shutil.rmtree(path) 
     os.mkdir(path)
 
-Shelf1_1=Shelf(["coca"],1,1,"shelf1_1",path)
-Shelf1_2=Shelf([""],1,2,"shelf1_2",path)
+
+
+Shelf1_1=Shelf([],1,1,"shelf1_1",path)
+Shelf1_2=Shelf([],1,2,"shelf1_2",path)
 
 Shelf2_1=Shelf([],2,1,"shelf2_1",path)
 Shelf2_2=Shelf([],2,2,"shelf2_2",path)
@@ -78,7 +80,7 @@ gui_receive_topic=a[-1]
 gui.publish(gui.topic,f"Yolo ready\n{gui_receive_topic}")
 
 gui_receive=Robot_MQTT_Position(host="broker.emqx.io",topic=gui_receive_topic,use_coordinate=False)
-
+gui_receive.start_mqtt()
 Robot_Pos=Robot_MQTT_Position(host="broker.emqx.io",topic="Robot")
 Robot_Pos.start_mqtt()
 
@@ -177,7 +179,7 @@ def Cam1():
 
 
             print_out=f"{Robot_Pos.message} Shelf {allow_model}"
-            below_cam.show_result(print_out)
+            below_cam.show_result(print_out,False,False)
             if cv2.waitKey(25)==ord('q') or break_thread==True:
                 break_thread=True
                 Shelf1_1.write_data_to_json()
@@ -253,7 +255,7 @@ def Cam3():
                 Shelf4_2.seen_product_checking(allow_model3, above_cam2.object_label_dict)
 
             print_out = f"{Robot_Pos.message} Shelf {allow_model3}"
-            above_cam2.show_result(print_out)
+            above_cam2.show_result(print_out,False,False)
             if cv2.waitKey(25) == ord('q') or break_thread==True:
                 break_thread = True
                 Shelf3_2.write_data_to_json()
@@ -291,7 +293,7 @@ def Cam4():
                 Shelf4_1.seen_product_checking(allow_model4, below_cam2.object_label_dict)
 
             print_out = f"{Robot_Pos.message} Shelf {allow_model4}"
-            below_cam2.show_result(print_out)
+            below_cam2.show_result(print_out,False,False)
             if cv2.waitKey(25) == ord('q') or break_thread:
                 break_thread = True
                 Shelf3_1.write_data_to_json()
@@ -326,7 +328,7 @@ def Sending():
         second=now.second
         message=message+f"date: {day}/{month}/{year} time: {hour}:{minute}:{second}\n"
         gui.publish(gui.topic,message)
-        time.sleep(1)
+        time.sleep(2)
 
 def Receiving():
     global break_thread
@@ -338,7 +340,7 @@ def Receiving():
                 temp=received_message.replace("Shelf","")
                 index=int(temp)
                 Shelf_Reset_Data(index)
-                           
+        time.sleep(1)
             
             
 
