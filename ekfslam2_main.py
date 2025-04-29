@@ -32,12 +32,12 @@ mcu = MyMCU("/dev/ttyUSB0", 115200)
 mcu.start()
 
 # Noise parameters
-Q = [6, 6]
+Q = [2, 2]
 R = [0.01, np.deg2rad(1)]
 
-robot = EkfSlam(min_range=150, max_range=1800, point_dist_threshold=15, min_cluster_size=6, max_cluster_size=25,
+robot = EkfSlam(min_range=150, max_range=6000, point_dist_threshold=12, min_cluster_size=6, max_cluster_size=25,
                 avg_angles_lower_bound=np.deg2rad(120), avg_angles_upper_bound=np.deg2rad(160), std_angles_threshold=np.deg2rad(6),
-                min_radius=42, max_radius=47, max_landmarks=25, Q=Q, R=R, maha_threshold=7, waypoint_min_distance=100)
+                min_radius=42, max_radius=47, max_landmarks=15, Q=Q, R=R, maha_threshold=7, waypoint_min_distance=150)
 
 # n = 0
 # test1 = []
@@ -55,7 +55,7 @@ try:
             # n += 1
             robot.extract_landmarks(scan)
             robot.correct()
-            print(robot.test, "\n")
+            print(robot.cov[:3, :3], "\n")
         robot.add_waypoint()
         
 except KeyboardInterrupt:
@@ -63,6 +63,7 @@ except KeyboardInterrupt:
     mcu.stop()
     robot.save_data()
     print(robot.mean)
+    print(robot.cov[:5, :5])
     print(robot.known_lm)
     # with open("test1.json", "w") as f:
     #     json.dump(test1, f)
