@@ -59,7 +59,7 @@ class gui_handling(Ui_MainWindow):
         self.sendSettingPushButton.setEnabled(False)
         self.worker = WorkerThread()
         self.read_worker=WorkerThread()
-        self.lines=''
+
         #path
 
         self.path = './shelves_info'
@@ -87,7 +87,6 @@ class gui_handling(Ui_MainWindow):
         self.addSubShelfPushButton.clicked.connect(self.addSubShelfButtonHandle)
         self.deleteSubShelfPushButton.clicked.connect(self.deleteSubShelfButtonHandle)
         self.loadSubShelfPushButton.clicked.connect(self.loadSubShelfButtonHandle)
-        self.subShelfProductLineEdit.setReadOnly(True)
 
 
         #watch shelf
@@ -232,8 +231,12 @@ class gui_handling(Ui_MainWindow):
                         wrong_object_text=temp_message[1].replace("Wrong object :","")
                         soos_text=temp_message[2].replace("-- SOOS:","")
                         oos_text=temp_message[3].replace("-- OOS:","")
-                        self.lines=wrong_object_text+'\n'+soos_text+'\n'+oos_text+'\n'
-                    
+                        file=f"shelf{x}_{y}.txt"
+                        full_status_file=f"{self.status_path}/{file}"
+                        with open(full_status_file, "w", encoding="utf-8") as f:
+                            f.write(wrong_object_text+'\n')
+                            f.write(soos_text+'\n')
+                            f.write(oos_text+'\n')
                 except:
                     print("error in handling received frame")
                     return
@@ -251,11 +254,17 @@ class gui_handling(Ui_MainWindow):
             oos_message=oos_message+f"\nSub shelf {i}: "
             file=f"shelf{self.watching_shelf}_{i}.txt"
             file_path=f"{self.status_path}/{file}"
-            wrong_message=wrong_message+"No object"
-            soos_message=soos_message+"No object"
-            oos_message=oos_message+"No OOS"
-            
-            for line in self.lines:                
+            if not os.path.exists(file_path):
+                print(f"shelf{self.watching_shelf}")
+                print("file doesn't exist")
+                wrong_message=wrong_message+"No object"
+                soos_message=soos_message+"No object"
+                oos_message=oos_message+"No OOS"
+                continue
+            with open(file_path, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+            temp=[]
+            for line in lines:                
                 line=line.replace("{","")
                 line=line.replace("}","")
                 line=line.replace('[',"")
