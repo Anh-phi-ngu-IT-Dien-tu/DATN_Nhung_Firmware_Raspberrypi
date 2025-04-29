@@ -87,6 +87,7 @@ class gui_handling(Ui_MainWindow):
         self.addSubShelfPushButton.clicked.connect(self.addSubShelfButtonHandle)
         self.deleteSubShelfPushButton.clicked.connect(self.deleteSubShelfButtonHandle)
         self.loadSubShelfPushButton.clicked.connect(self.loadSubShelfButtonHandle)
+        self.subShelfProductLineEdit.setReadOnly(True)
 
 
         #watch shelf
