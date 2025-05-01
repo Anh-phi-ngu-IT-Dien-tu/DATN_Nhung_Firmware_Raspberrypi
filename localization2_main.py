@@ -4,6 +4,8 @@ from my_mcu import MyMCU
 import numpy as np
 import time
 from my_mqtt import MyMQTT
+import math
+import json
 
 mqtt=MyMQTT(broker="broker.emqx.io")
 mqtt.start()
@@ -14,6 +16,8 @@ lidar.start()
 
 mcu = MyMCU("/dev/ttyUSB0", 115200)
 mcu.start()
+
+data = []
 
 # Noise parameters
 Q = [0.8 , 0.8]
@@ -42,6 +46,12 @@ try:
         # print(robot.linear_vel, robot.turn_vel)
         mcu.write(robot.linear_vel, robot.turn_vel)
         mqtt.write(robot.mean[0,0],robot.mean[1,0],robot.mean[2,0])
+
+        if (len(data) == 0):
+            data.append([robot.mean[0, 0], robot.mean[1, 0], robot.mean[2, 0]])
+        else:
+            if math.sqrt((data[-1][0] - robot.mean[0, 0])**2 + (data[-1][1] - robot.mean[1, 0])**2) > 150:
+                data.append([robot.mean[0, 0], robot.mean[1, 0], robot.mean[2, 0]])
         
 except KeyboardInterrupt:
     lidar.stop()
@@ -50,4 +60,6 @@ except KeyboardInterrupt:
     mqtt.stop()
     print(robot.mean)
     print(robot.cov)
+    with open("data.json", "w") as f:
+        json.dump(data, f)
     
