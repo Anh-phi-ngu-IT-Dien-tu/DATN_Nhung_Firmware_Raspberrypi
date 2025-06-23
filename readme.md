@@ -66,6 +66,8 @@ https://github.com/Anh-phi-ngu-IT-Dien-tu/DATN_Nhung_Firmware_Raspberrypi/tree/V
 https://github.com/Anh-phi-ngu-IT-Dien-tu/DATN_Nhung_Firmware_Raspberrypi/tree/Python_GUI 
 ![alt text](image-13.png)
 
+## Landmark
+![alt text](image-14.png)
 
 ## Results and Evaluation
 https://youtu.be/jIvI4DPsrL0?si=AIefCEjHjDwL9q_E
@@ -73,11 +75,11 @@ https://youtu.be/jIvI4DPsrL0?si=AIefCEjHjDwL9q_E
 ### Advantages
 - Reducing observation cost
 - Yolov8 model can work with high confidence
-- Robot can move aroùn the store the way we want
+- Robot can move around the store the way we want
 
 ### Limitations
 - Time consumption for setup steps
-- There are some small error for feature-based landmark
+- There are some small error for feature-based landmark 
 - The path-defining algorithm is too dependent to the operation who controlling the robot with bluetooth app
 - The overall image processing algorithm can not determine the complicated situations
 - The GUI still not enough user-friendly
