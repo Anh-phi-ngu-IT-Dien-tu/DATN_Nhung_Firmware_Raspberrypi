@@ -1,7 +1,7 @@
 #  Shelves store monitoring robot
 
 ## Introduction
-This project focus on creating a mobile robot that can gather monitor shelves information like the shortage of goods, or misplaced goods 
+This project focus on creating a mobile robot that can monitor shelves information like the shortage of goods, or misplaced goods 
 
 ## Contributors
 - Vu Quoc Khanh : EKF SLAM, EKF Localization, Path-tracking algorithm
