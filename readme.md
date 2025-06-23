@@ -4,9 +4,9 @@
 This project focus on creating a mobile robot that can gather information about the information about shelves information like the shortage of goods, or misplaced goods 
 
 ## Contributors
-- Vu Quoc Khanh
-- Dao Anh Phi
-- Dang Van Vinh
+- Vu Quoc Khanh : EKF SLAM, EKF Localization, Path-tracking algorithm
+- Dao Anh Phi : Circuit design, STM32F103C8T6 firmware, GUI with QT5 on python
+- Dang Van Vinh : Camera handling, image processing algorithm, Yolov8 model, Yolov8 training data
   
 ## Features
 - Using 2-wheel mobile robot
@@ -31,34 +31,39 @@ This project focus on creating a mobile robot that can gather information about 
 - **Camera**: ESP32 Camera
 
 ## Hardware Design
-### Circuit Diagram
+https://github.com/Anh-phi-ngu-IT-Dien-tu/DATN_Nhung_Firmware_Raspberrypi/tree/Motor_PCB_Design
 ![alt text](image-2.png)
 
 ## Software Design
 ### Android app for controlling robot while defining map, robot path
 https://github.com/Anh-phi-ngu-IT-Dien-tu/DATN_Nhung_Firmware_Raspberrypi/tree/Android_app
 ### STM32F103C8T6 Firmware
+https://github.com/Anh-phi-ngu-IT-Dien-tu/DATN_Nhung_Firmware_Raspberrypi/tree/Motor
 ![alt text](image-10.png)
 ![alt text](image-3.png)
 ### EKF Algorithm (On Raspberry pi 4):
+https://github.com/Anh-phi-ngu-IT-Dien-tu/DATN_Nhung_Firmware_Raspberrypi/tree/Raspberrypi
 ![alt text](image-4.png)
-### Feature extraction (On Raspberry pi 4):
+#### Feature extraction (On Raspberry pi 4):
 ![alt text](image-5.png)
-### EKF SLAM for defining map, robot path
+#### EKF SLAM for defining map, robot path
 ![alt text](image-6.png)
-### EKF Localization for tracking robot positiom
+#### EKF Localization for tracking robot positiom
 ![alt text](image-7.png)
-### Path-tracking with P controller
+#### Path-tracking with P controller
 ![alt text](image-8.png)
 ![alt text](image-9.png)
-### Camera handling algorithm
+### Image processing algorithm
+https://github.com/Anh-phi-ngu-IT-Dien-tu/DATN_Nhung_Firmware_Raspberrypi/tree/Vision_Part
+#### Camera handling algorithm
 ![alt text](image-11.png)
-### Yolov8 data 
+#### Yolov8 data 
 ![alt text](image-12.png)
-### Yolov8 models, classes
+#### Yolov8 models, classes
 - **Object detection model**: 21 class: 247, Chinsu, ChocoPie, D.Thanh, Heineken, Oreo, Pepsi-xanh, Redbull, Revive-chanh,Simply, TH true Milk, Tea Plus, Vinamilk, coca, coca-chai, custas, fanta-cam, khongdo, number1, sting, vinhhao
-- **Almost out-out detection**: 2 class: oos (Out of stock) và semi-oos (Semi out of stock)
-### GUI 
+- **Almost out, out detection**: 2 class: oos (Out of stock) and semi-oos (Semi out of stock)
+### GUI
+https://github.com/Anh-phi-ngu-IT-Dien-tu/DATN_Nhung_Firmware_Raspberrypi/tree/Python_GUI 
 ![alt text](image-13.png)
 
 
