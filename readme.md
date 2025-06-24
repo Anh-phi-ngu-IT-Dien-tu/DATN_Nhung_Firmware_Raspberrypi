@@ -18,7 +18,7 @@ This project focus on creating a mobile robot that can monitor shelves informati
 
 ## System Overview
 ### Block Diagram
-![alt text](image.png)
+![alt text](assets-images/image.png)
 ![alt text](image-1.png)
 
 ### Components
