@@ -1,0 +1,4 @@
+../Core/Src/BTS7960_control.c:16:6:readEncoder	32	static
+../Core/Src/BTS7960_control.c:36:6:motorControl1	24	static
+../Core/Src/BTS7960_control.c:74:6:motorControl2	24	static
+../Core/Src/BTS7960_control.c:124:6:pidMotorControl	24	static
